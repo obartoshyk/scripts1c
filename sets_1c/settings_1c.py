@@ -82,9 +82,9 @@ class FileManager(object):
 	def __init__(self):
 		super(FileManager, self).__init__()
 	
-	def tmpf(self,path,ext):
+	def tmpf(self,path,name,ext):
 		k = 0
-		while os.path.exists("{}/tmp{:04}.{}".format(path,k,ext)	): 
+		while os.path.exists("{}/{}{:04}.{}".format(path,name,k,ext)	): 
 			k = k+1
 		return 	"{}tmp{:04}.{}".format(path,k,ext)	
 
@@ -93,10 +93,11 @@ class FileManager(object):
 		return "{}{:02}{:02}".format(lt.tm_year,lt.tm_mon,lt.tm_mday)
 		
 	def tmp_pach(self):
-		return ""
+		return "/tmp"
 
-	def bkp_filename_dt(base):
-		sets = settings_1c.Settings()
+	def tmp_bkp_filename_dt(base):
+		return self.tmpf(tmp_pach,name,"dt")
+
 		#backup_cat = '{0}/{1}'.format(sets.backup_cat,today_str())
 		#if not os.path.exists(backup_cat):
 		#	os.mkdir(backup_cat)

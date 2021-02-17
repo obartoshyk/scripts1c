@@ -6,11 +6,11 @@ from . import settings_1c
 
 class Connection(object):
 	""" Connection to 1C servers uses paramiko"""
-	def __init__(self,srv_name, testmode=False):
+	def __init__(self,srv="",ssh_key="", test=False, **kwargs):
 		super(Connection, self).__init__()
 		sets = settings_1c.Settings()
-		self.testmode = testmode
-		self.srv_name = srv_name
+		self.testmode = test
+		self.srv_name = srv
 
 		self.rac_pach = sets.rac_pach["deb"]
 		self.ibcmd_pach = sets.ibcmd_pach["deb"]
@@ -20,9 +20,9 @@ class Connection(object):
 		self.ssh = paramiko.SSHClient()
 		self.ssh.load_system_host_keys()
 		self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-		self.ssh.connect(hostname=srv_name,
+		self.ssh.connect(hostname=srv,
 						username='root',
-						key_filename=sets.ssh_key)
+						key_filename=ssh_key)
 	
 
 	def __del__(self):

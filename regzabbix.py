@@ -7,15 +7,14 @@ reg zabbix agent after update version 1C
 from sets_1c import settings_1c, connection_1c, argparse_1c
 from io import BytesIO
 
-sets = settings_1c.Settings()
-parser =argparse_1c.ArgumentParser_1C("s",description=__doc__)
+parser =argparse_1c.ArgumentParser_1C("sk",description=__doc__)
 parser.add_argument('-p','--params' ,
 				metavar="param:base",
 				help='',
 				nargs="*",type=str, required=True)
 parser.decode_arg()
 
-conn=connection_1c.Connection(parser.s[0],parser.args["test"])
+conn=connection_1c.Connection(srv=parser.s[0],**parser.args)
 conn.init_bases()
 
 
@@ -24,10 +23,7 @@ b = "UserParameter={param}, {rac_pach} session --cluster={cluster} list --infoba
 n = "UserParameter={param}, {rac_pach} session --cluster={cluster} list | grep -i user-name | wc -l"
 for pb in parser.args["params"]:
 	param, base = pb.split(':')
-	#print(pb.split(':'))
 	if base:
-		#print("base=",base)
-		#print(conn.bases_dict)
 		st.append(b.format(param=param,
 						rac_pach=sets.rac_pach["deb"],
 						**conn.bases_dict[base]))

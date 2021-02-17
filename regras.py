@@ -3,9 +3,9 @@
 """ reg 'ras' after update version 1C"""
 from sets_1c import settings_1c, connection_1c, argparse_1c
 
-sets = settings_1c.Settings()
-parser =argparse_1c.ArgumentParser_1C("s",description=__doc__)
+parser =argparse_1c.ArgumentParser_1C("sk",description=__doc__)
 parser.decode_arg()
+
 
 conn=connection_1c.Connection(parser.s[0])
 testmode = parser.args["test"]
