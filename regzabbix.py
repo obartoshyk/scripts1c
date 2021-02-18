@@ -13,32 +13,33 @@ parser.add_argument('-p','--params' ,
 				help='',
 				nargs="*",type=str, required=True)
 parser.decode_arg()
+sets = settings_1c.Settings()
 
-conn=connection_1c.Connection(srv=parser.s[0],**parser.args)
-conn.init_bases()
+with connection_1c.Connection(srv=parser.s[0],**parser.args) as conn:
+	conn.init_bases()
 
 
-st = []
-b = "UserParameter={param}, {rac_pach} session --cluster={cluster} list --infobase={infobase} | grep -i user-name | wc -l"
-n = "UserParameter={param}, {rac_pach} session --cluster={cluster} list | grep -i user-name | wc -l"
-for pb in parser.args["params"]:
-	param, base = pb.split(':')
-	if base:
-		st.append(b.format(param=param,
-						rac_pach=sets.rac_pach["deb"],
-						**conn.bases_dict[base]))
-	else:	
-		for cluster in conn.clusters_list:
-			st.append(n.format(param=param,
+	st = []
+	b = "UserParameter={param}, {rac_pach} session --cluster={cluster} list --infobase={infobase} | grep -i user-name | wc -l"
+	n = "UserParameter={param}, {rac_pach} session --cluster={cluster} list | grep -i user-name | wc -l"
+	for pb in parser.args["params"]:
+		param, base = pb.split(':')
+		if base:
+			st.append(b.format(param=param,
+							rac_pach=sets.rac_pach["deb"],
+							**conn.bases_dict[base]))
+		else:	
+			for cluster in conn.clusters_list:
+				st.append(n.format(param=param,
 						rac_pach=sets.rac_pach["deb"],
 						cluster=cluster))
 
-if conn.testmode:
-	print("\n".join(st))
-else:
-	conf_file ="/etc/zabbix/zabbix_agentd.d/userparameter_mysql.conf"
-	ftp = conn.ssh.open_sftp()
-	ftp.putfo(BytesIO("\n".join(st).encode()), conf_file)
-	ftp.close()
-	conn.cast("chmod a+r " + conf_file)
-	conn.cast("/etc/init.d/zabbix-agent restart")
+	if conn.testmode:
+		print("\n".join(st))
+	else:
+		conf_file ="/etc/zabbix/zabbix_agentd.d/userparameter_mysql.conf"
+		ftp = conn.ssh.open_sftp()
+		ftp.putfo(BytesIO("\n".join(st).encode()), conf_file)
+		if ftp: ftp.close()
+		conn.cast("chmod a+r " + conf_file)
+		conn.cast("/etc/init.d/zabbix-agent restart")

@@ -10,7 +10,9 @@ class Connection(object):
 		super(Connection, self).__init__()
 		sets = settings_1c.Settings()
 		self.testmode = test
-		self.srv_name = srv
+		self.srv = srv
+		self.ssh_key = ssh_key
+		self.connected = False
 
 		self.rac_pach = sets.rac_pach["deb"]
 		self.ibcmd_pach = sets.ibcmd_pach["deb"]
@@ -20,16 +22,27 @@ class Connection(object):
 		self.ssh = paramiko.SSHClient()
 		self.ssh.load_system_host_keys()
 		self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-		self.ssh.connect(hostname=srv,
-						username='root',
-						key_filename=ssh_key)
+		
+
+	def __enter__(self):
+		self.ssh.connect(hostname=self.srv,
+					username='root',
+					key_filename=self.ssh_key)
+		self.connected =True
+		return self
 	
+	def __exit__(self, type1, value, traceback):
+		if self.connected:
+			self.ssh.close()
+			self.connected = False		
 
 	def __del__(self):
-		self.ssh.close()
+		if self.connected:
+			self.ssh.close()
+			self.connected = False
 
 	def cast(self,cmd):
-		print("cast {0}: {1}".format(self.srv_name,cmd))
+		print("cast {0}: {1}".format(self.srv,cmd))
 		stdin, stdout, stderr = self.ssh.exec_command(cmd)
 		data =  stdout.read().decode()
 		#+stderr.read()

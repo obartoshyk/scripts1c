@@ -82,11 +82,13 @@ class FileManager(object):
 	def __init__(self):
 		super(FileManager, self).__init__()
 	
+
 	def tmpf(self,path,name,ext):
-		k = 0
-		while os.path.exists("{}/{}{:04}.{}".format(path,name,k,ext)	): 
+		k = 1
+		while os.path.exists("".join([path,"/",name,"_",self.today_str(),"_","{:04}".format(k),".",ext]) ): 
 			k = k+1
-		return 	"{}tmp{:04}.{}".format(path,k,ext)	
+		return 	"".join([path,"/",name,"_",self.today_str(),"_","{:04}".format(k),".",ext])
+
 
 	def today_str(self):
 		lt = time.localtime(time.time())
@@ -95,8 +97,8 @@ class FileManager(object):
 	def tmp_pach(self):
 		return "/tmp"
 
-	def tmp_bkp_filename_dt(base):
-		return self.tmpf(tmp_pach,name,"dt")
+	def tmp_bkp_filename_dt(self,base):
+		return self.tmpf( self.tmp_pach(),base,"dt")
 
 		#backup_cat = '{0}/{1}'.format(sets.backup_cat,today_str())
 		#if not os.path.exists(backup_cat):

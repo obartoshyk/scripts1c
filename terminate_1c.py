@@ -18,8 +18,8 @@ if __name__ == "__main__":
 		raise "I simple can`t ruin everything!"
 
 	for srv in parser.s:
-		conn=connection_1c.Connection(srv=srv,**parser.args)
-		sm  =connection_1c.SessionManager(conn)
-		for base in (parser.b if parser.b else conn.bases_dict.keys()):
-			terminate(sm, base, parser.c)
+		with connection_1c.Connection(srv=srv,**parser.args) as conn:
+			sm  =connection_1c.SessionManager(conn)
+			for base in (parser.b if parser.b else conn.bases_dict.keys()):
+				terminate(sm, base, parser.c)
 
