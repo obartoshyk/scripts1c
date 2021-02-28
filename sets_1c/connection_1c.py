@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 #import subprocess
-import paramiko
+import paramiko, socket
 from . import settings_1c
 
 class Connection(object):
@@ -45,7 +45,10 @@ class Connection(object):
 		print("cast {0}: {1}".format(self.srv,cmd))
 		stdin, stdout, stderr = self.ssh.exec_command(cmd)
 		data =  stdout.read().decode()
-		#+stderr.read()
+		err = stderr.read().decode()
+		if err:
+			self.err = err
+			print(err)
 		if self.testmode: print("data: {0}".format(data))
 		return (data)
 
@@ -56,7 +59,10 @@ class Connection(object):
 
 	def ibcmd(self,*args):
 		cmd = "{0} {1}".format(self.ibcmd_pach," ".join(args))
-		return self.cast(cmd)		
+		if self.testmode:
+			print("TEST: {0}".format(cmd))
+		else:
+			return self.cast(cmd)		
 
 	def takekeys(self,s0):
 		d = {}
@@ -132,15 +138,18 @@ class SessionManager(object):
 
 class BaseLock(object):
 	"""block base to make safe backup"""
-	def __init__(self,conn,base):
+	def __init__(self,conn,base,usr,pwd):
 		super(BaseLock, self).__init__()
 		self.conn=conn
 		self.base=base
 		self.locked=False
 		self.testmode = self.conn.testmode
+		self.usr=usr
+		self.pwd=pwd
 
 	def __enter__(self):	
 		cmd ="infobase --cluster={cluster} update --infobase={infobase}" 
+		cmd = cmd+" --infobase-user={} --infobase-pwd={}".format(self.usr,self.pwd)
 		cmd = cmd+" --sessions-deny=on --scheduled-jobs-deny=on"
 		cmd = cmd+'--denied-message="backup in progress"'
 		cmd = cmd.format(**self.conn.bases_dict[self.base])
@@ -149,13 +158,12 @@ class BaseLock(object):
 		else:	
 			self.conn.rac(cmd)
 		self.locked=True
+		return self
 		
 	def __exit__(self, type1, value, traceback):
-		print("type=",type1)
-		print("value=",value)
-		print("traceback=",traceback)
 		if self.locked:
 			cmd ="infobase --cluster={cluster} update --infobase={infobase}" 
+			cmd = cmd+" --infobase-user={} --infobase-pwd={}".format(self.usr,self.pwd)
 			cmd = cmd+" --sessions-deny=off --scheduled-jobs-deny=off"
 			cmd = cmd.format(	**self.conn.bases_dict[self.base])
 			if self.testmode:
@@ -169,56 +177,30 @@ class IbcmdManager(object):
 	"""docstring for IbcmdManager"""
 	def __init__(self,connection,srv,base,usr,pwd ):
 		super(IbcmdManager, self).__init__()
-		self.testmode = False
 		self.conn = connection
-		#--db-server=localhost
+		self.testmode = self.conn.testmode
 		#--dbms=MSSQLServer postgresql
-		#--db-name=sb_demo
-		#--db-user=test_db_user
-		#--db-pwd=test_pwd_123
 		self.bparams = ["--dbms=postgresql"]
-		self.bparams.append( "--db-server="+srv)
+		self.bparams.append( "--db-server="+socket.gethostbyname(srv))
 		self.bparams.append( "--db-name="+base)
 		self.bparams.append( "--db-user="+usr)
 		self.bparams.append( "--db-pwd="+pwd)
 
-	def make_req(self,req,file_pach):
-		cmd = " ".join([req,*self.bparams,file_pach])
+	def make_req(self,cmd):
 		if self.testmode:
 			print("TEST: {0}".format(cmd))	
 		else:
-			self.conn.ibcmd(cmd)
+			return self.conn.ibcmd(cmd)
 
-	def infobase_dump(self,file_pach):
-		"""make base backup, block base before"""
-		self.make_req("infobase dump",file_pach)
-
-	def infobase_restore(self,file_pach):
-		"""restore base backup, block base before"""
-		self.make_req("infobase restore",file_pach)	
-
-	def infobase_config_load(self,file_pach):
-		"""update base config, block base before"""
-		self.make_req("infobase config load",file_pach)	
-		
-	def infobase_config_save(self,file_pach):
-		"""backup base config, block base before"""
-		self.make_req("infobase config save",file_pach)		
-		
-	def infobase_config_import(self,file_pach):
-		self.make_req("infobase config import",file_pach)	
-
-	def infobase_config_export(self,file_pach):
-		self.make_req("infobase config export",file_pach)	
-
-	def infobase_config_apply(self,file_pach):
-		self.make_req("infobase config apply --force",file_pach)				
-
-											
-
-		
-
-
-
-		
+	def infobase_command(self,command,file_pach):
+		"""dump : make base backup, block base before
+		restore : restore base backup, block base before
+		config load : update base config, block base before
+		config save : backup base config, block base before
+		config import
+		config export
+		config apply --force
+		 """
+		cmd = " ".join(["infobase",command,*self.bparams,file_pach]) 
+		return self.make_req(cmd)
 

@@ -100,6 +100,9 @@ class FileManager(object):
 	def tmp_bkp_filename_dt(self,base):
 		return self.tmpf( self.tmp_pach(),base,"dt")
 
+	def tmp_bkp_filename_log(self,base):
+		return self.tmpf( self.tmp_pach(),base,"log")
+
 		#backup_cat = '{0}/{1}'.format(sets.backup_cat,today_str())
 		#if not os.path.exists(backup_cat):
 		#	os.mkdir(backup_cat)

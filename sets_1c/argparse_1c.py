@@ -17,6 +17,16 @@ class ArgumentParser_1C(argparse.ArgumentParser):
 		self.add_d()
 		self.add_k()
 
+	def decode_arg(self):
+		args = vars(self.parse_args())
+		self.args = args
+		self.decode_b(args)	
+		self.decode_s(args)
+		self.decode_c(args)
+		self.decode_u(args)
+		self.decode_d(args)
+		#self.decode_k(args)
+
 	def add_b(self):
 		sets = settings_1c.Settings()
 		if self.modeline.find("b")!=-1:
@@ -86,13 +96,6 @@ class ArgumentParser_1C(argparse.ArgumentParser):
 				help='rsa key to ssh connection',
 				nargs=1,type=str, required=False)							
 
-	def decode_arg(self):
-		args = vars(self.parse_args())
-		self.args = args
-		self.decode_b(args)	
-		self.decode_s(args)
-		self.decode_c(args)
-		self.decode_u(args)
 
 	def decode_b(self,args):
 		sets = settings_1c.Settings()	
@@ -119,12 +122,4 @@ class ArgumentParser_1C(argparse.ArgumentParser):
 
 	def decode_d(self,args):
 		if self.modeline.find("d")!=-1:
-			self.db_usr,self.db_pwd = args['db_user'][0].split(":")		
-
-
-
-
-
-		
-
-	
+			self.db_usr,self.db_pwd = args['db_user'][0].split(":")
