@@ -2,6 +2,10 @@
 # -*- coding: UTF-8 -*-
 import os, time
 
+def str_cur_time():
+	lt = time.localtime(time.time())
+	return "{}/{:02}/{:02}:{}.{}.{}".format(lt.tm_year,lt.tm_mon,lt.tm_mday,lt.tm_hour,lt.tm_min,lt.tm_sec)
+
 class Settings(object):
 	"""default options to use 1C scripts"""
 	def __init__(self):
