@@ -157,6 +157,7 @@ class BaseLock(object):
 			print("TEST: {0}".format(cmd))	
 		else:	
 			self.conn.rac(cmd)
+			
 		self.locked=True
 		return self
 		

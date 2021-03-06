@@ -89,6 +89,8 @@ class FileManager(object):
 			k = k+1
 		return 	"".join([path,"/",name,"_",self.today_str(),"_","{:04}".format(k),".",ext])
 
+	def init_bkp_pach(self,pach):
+		self.bkp_pach=pach
 
 	def today_str(self):
 		lt = time.localtime(time.time())
@@ -97,8 +99,14 @@ class FileManager(object):
 	def tmp_pach(self):
 		return "/tmp"
 
-	def tmp_bkp_filename_dt(self,base):
-		return self.tmpf( self.tmp_pach(),base,"dt")
+	def dest_bkp_pach(self,dim):
+		return "{}/{}".format(self.bkp_pach,dim)
+
+	def dest_bkp_filename(self,base,dim):
+		return self.tmpf( self.dest_bkp_pach(dim),base,dim)
+
+	def tmp_bkp_filename(self,base,dim):
+		return self.tmpf( self.tmp_pach(),base,dim)
 
 	def tmp_bkp_filename_log(self,base):
 		return self.tmpf( self.tmp_pach(),base,"log")
