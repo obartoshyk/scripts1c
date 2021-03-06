@@ -12,7 +12,7 @@ parser.decode_arg()
 fm = settings_1c.FileManager()
 fm.init_bkp_pach(parser.args["pach"][0])
 srv=parser.s[0]
-print("***starting backup srv:",srv)	
+print("***{} starting backup {}".format(settings_1c.str_cur_time(),srv))	
 with connection_1c.Connection(srv=srv,**parser.args) as conn:
 
 	sm = connection_1c.SessionManager(conn)
@@ -22,20 +22,21 @@ with connection_1c.Connection(srv=srv,**parser.args) as conn:
 		tmp_dt = fm.tmp_bkp_filename(b,"dt")
 		dest_dt = fm.dest_bkp_filename(b,"dt")
 
-		print("***starting dump:",b)	
-		
+		print("***{} starting dump {}".format(settings_1c.str_cur_time(),b))
+
 		sm.terminate_all(b)
 
 		with connection_1c.BaseLock(conn,b,parser.usr,parser.pwd) as bl:
 			im = connection_1c.IbcmdManager(conn,srv,b,parser.db_usr,parser.db_pwd)
 			print(im.infobase_command("dump",tmp_dt))
 
-		conn.cast("chmod a+r " + tmp_dt)
-		ftp = conn.ssh.open_sftp()
-		ftp.get(tmp_dt,dest_dt)
-		ftp.remove(tmp_dt)
-		if ftp: ftp.close()
+		if not conn.testmode:	
+			conn.cast("chmod a+r " + tmp_dt)
+			ftp = conn.ssh.open_sftp()
+			ftp.get(tmp_dt,dest_dt)
+			ftp.remove(tmp_dt)
+			if ftp: ftp.close()
 
-		print("***finished dump:",b)
+		print("***{} finished dump {}".format(settings_1c.str_cur_time(),b))
 
-print("***finished backup srv:",srv)		
+print("***{} finished backup {}".format(settings_1c.str_cur_time(),srv))
