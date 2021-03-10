@@ -26,6 +26,8 @@ with connection_1c.Connection(srv=srv,**parser.args) as conn:
 
 		sm.terminate_all(b)
 
+		
+
 		with connection_1c.BaseLock(conn,b,parser.usr,parser.pwd) as bl:
 			im = connection_1c.IbcmdManager(conn,srv,b,parser.db_usr,parser.db_pwd)
 			print(im.infobase_command("dump",tmp_dt))
