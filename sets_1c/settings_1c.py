@@ -103,11 +103,8 @@ class FileManager(object):
 	def tmp_pach(self):
 		return "/tmp"
 
-	def dest_bkp_pach(self,dim):
-		return "{}/{}".format(self.bkp_pach,dim)
-
 	def dest_bkp_filename(self,base,dim):
-		return self.tmpf( self.dest_bkp_pach(dim),base,dim)
+		return self.tmpf( self.bkp_pach,base,dim)
 
 	def tmp_bkp_filename(self,base,dim):
 		return self.tmpf( self.tmp_pach(),base,dim)
