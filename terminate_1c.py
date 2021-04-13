@@ -15,7 +15,7 @@ if __name__ == "__main__":
 	parser =argparse_1c.ArgumentParser_1C("SBCk",description=__doc__) 
 	parser.decode_arg()
 	if not(parser.args["base"]) and not(parser.args["client"]):
-		raise "I simple can`t ruin everything!"
+		raise "I can`t ruin everything again!"
 
 	for srv in parser.s:
 		with connection_1c.Connection(srv=srv,**parser.args) as conn:
