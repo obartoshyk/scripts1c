@@ -13,8 +13,11 @@ class Connection(object):
 		self.srv = srv
 		self.ssh_key = ssh_key
 		self.connected = False
+		self.init_ras = False
+		self.err = ""
 
 		self.rac_pach = sets.rac_pach["deb"]
+		self.ras_pach = sets.ras_pach["deb"]
 		self.ibcmd_pach = sets.ibcmd_pach["deb"]
 
 		self.clusters_list = []
@@ -26,11 +29,11 @@ class Connection(object):
 
 	def __enter__(self):
 		self.ssh.connect(hostname=self.srv,
-					username='root',
-					key_filename=self.ssh_key)
+				username='root',
+				key_filename=self.ssh_key)
 		self.connected =True
 		return self
-	
+
 	def __exit__(self, type1, value, traceback):
 		if self.connected:
 			self.ssh.close()
@@ -48,14 +51,21 @@ class Connection(object):
 		err = stderr.read().decode()
 		if err:
 			self.err = err
-			print(err)
+			print("cast error: {}".format(err) )
 		if self.testmode: print("data: {0}".format(data))
-		return (data)
+		return data
 
 
 	def rac(self,*args):
-		cmd = "{0} {1}".format(self.rac_pach," ".join(args))
-		return self.cast(cmd)		
+		cmd  = "{0} {1}".format(self.rac_pach," ".join(args))
+		data = self.cast(cmd)
+		if self.err and not self.init_ras:
+			self.init_ras = True
+			self.err = ""
+			self.regras()
+			return self.cast(cmd)
+		return data
+
 
 	def ibcmd(self,*args):
 		cmd = "{0} {1}".format(self.ibcmd_pach," ".join(args))
@@ -102,6 +112,15 @@ class Connection(object):
 				l["cluster"]=cluster
 				self.bases_dict[l["name"]] = l
 
+	def regras(self):
+		answ=self.cast('ps -C ras --format "pid"').split("\n")
+		if len(answ)>2:
+			for k in range(1,len(answ)-1):
+				print("pid:"+answ[k])
+				if not self.testmode: self.cast('kill{0}'.format(answ[k]))
+		if not self.testmode: 
+			self.cast( "{0} --daemon cluster".format(self.ras_pach))
+			self.init_ras = True
 
 class SessionManager(object):
 	"""find and destroy user session"""
