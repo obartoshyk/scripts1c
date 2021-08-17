@@ -19,6 +19,7 @@ class Connection(object):
 		self.rac_pach = sets.rac_pach["deb"]
 		self.ras_pach = sets.ras_pach["deb"]
 		self.ibcmd_pach = sets.ibcmd_pach["deb"]
+		self.ibsrv_pach = sets.ibsrv_pach["deb"]
 
 		self.clusters_list = []
 		self.bases_dict = {}
