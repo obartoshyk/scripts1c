@@ -30,7 +30,8 @@ def remote_run(cmd_list,conn):
 
 def local_run(cmd_list,testmode):
 	for cmd in cmd_list:
-		os.system(cmd) if not testmode else print(cmd)
+		print("run: {}".format(cmd))
+		if not testmode : os.system(cmd) 
 
 
 def remote(parser):
