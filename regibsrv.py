@@ -45,7 +45,7 @@ def remote(parser):
 
 def local(parser):
 	answ=os.popen('ps -C ibsrv --format "pid"').read().split("\n")
-	local_run(kill_list(answ),conn)
+	local_run(kill_list(answ),parser.args["test"])
 	local_run(ibsrv_start_cmd_list(parser.args["pach"][0],os),parser.args["test"])
 	
 
