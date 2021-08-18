@@ -14,23 +14,18 @@ parser.decode_arg()
 
 with connection_1c.Connection(srv=parser.s[0],**parser.args) as conn:
 	answ=conn.cast('ps -C ibsrv --format "pid"').split("\n")
-	print(answ)
 	if len(answ)>2:
 		for k in range(1,len(answ)-1):
-			#print("pid:"+answ[k])
-			if answ[k] and not conn.testmode: self.cast('kill -9 {0}'.format(answ[k]))
+			cmd = 'kill -9 {0}'.format(answ[k])
+			conn.cast(cmd) if answ[k] and not conn.testmode else print(cmd)
 
 
 	ftp = conn.ssh.open_sftp()
-	for c_file in ftp.listdir(parser.args["pach"][0]):
-		if c_file and not conn.testmode:
-			print('{0} -c "{1}" --daemon'.format(conn.ibsrv_pach,c_file))	
-	if ftp: ftp.close()
-	
-#test = os.listdir("{dir_name}/{base_name}_local".format(dir_name=dir_name,base_name=base_name))
-# 
-#s = 'scp -r {dir_name}/{base_name}_local/{f_name} root@vps862.dc-sig.gurtam.net:/home/sandbox/{base_name}/{f_name}' 
-#for f_name in test:
-#	print(f_name)
-#	print(s.format(dir_name=dir_name,base_name=base_name,f_name=f_name))
-# 	os.system(s.format(dir_name=dir_name,base_name=base_name,f_name=f_name))
+	for c_file in ftp.listdir("{pach}/conf".format(pach=parser.args["pach"][0])):
+		basename = c_file.replace(".yaml","")
+		cmd = '{ibsrv_pach} -c "{pach}/conf/{basename}.yaml" --data "{pach}/{basename}_wdr" --daemon'.format(
+			ibsrv_pach=conn.ibsrv_pach
+			,pach=parser.args["pach"][0]
+			,basename=basename)
+		conn.cast(cmd) if not conn.testmode else print(cmd)
+	if ftp: ftp.close()	
