@@ -5,7 +5,7 @@
 reg ibsrv daemon from conf on remote server
 """
 from sets_1c import settings_1c, connection_1c, argparse_1c
-import os
+import os, time
 
 def ibsrv_start_cmd(pach,c_file):
 	return '{ibsrv_pach} -c "{pach}/conf/{basename}.yaml" --data "{pach}/{basename}_wdr" --daemon'.format(
@@ -38,6 +38,7 @@ def remote(parser):
 	with connection_1c.Connection(srv=parser.s[0],**parser.args) as conn:
 		answ=conn.cast('ps -C ibsrv --format "pid"').split("\n")
 		remote_run(kill_list(answ),conn)
+		time.sleep(5)
 		ftp = conn.ssh.open_sftp()
 		if ftp: 
 			remote_run(ibsrv_start_cmd_list(parser.args["pach"][0],ftp),conn)
@@ -47,6 +48,7 @@ def remote(parser):
 def local(parser):
 	answ=os.popen('ps -C ibsrv --format "pid"').read().split("\n")
 	local_run(kill_list(answ),parser.args["test"])
+	time.sleep(5)
 	local_run(ibsrv_start_cmd_list(parser.args["pach"][0],os),parser.args["test"])
 	
 
