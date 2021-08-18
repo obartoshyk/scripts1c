@@ -27,7 +27,7 @@ def remote(srv):
 
 
 def local():
-	answ=os.system('ps -C ibsrv --format "pid"').split("\n")
+	answ=os.popen('ps -C ibsrv --format "pid"').read().split("\n")
 	if len(answ)>2:
 		for k in range(1,len(answ)-1):
 			cmd = 'kill -9 {0}'.format(answ[k])
