@@ -19,7 +19,6 @@ with connection_1c.Connection(srv=parser.s[0],**parser.args) as conn:
 			cmd = 'kill -9 {0}'.format(answ[k])
 			conn.cast(cmd) if answ[k] and not conn.testmode else print(cmd)
 
-
 	ftp = conn.ssh.open_sftp()
 	for c_file in ftp.listdir("{pach}/conf".format(pach=parser.args["pach"][0])):
 		basename = c_file.replace(".yaml","")
@@ -28,4 +27,4 @@ with connection_1c.Connection(srv=parser.s[0],**parser.args) as conn:
 			,pach=parser.args["pach"][0]
 			,basename=basename)
 		conn.cast(cmd) if not conn.testmode else print(cmd)
-	if ftp: ftp.close()	
+	if ftp: ftp.close()
