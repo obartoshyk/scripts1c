@@ -7,39 +7,46 @@ reg ibsrv daemon from conf on remote server
 from sets_1c import settings_1c, connection_1c, argparse_1c
 import os
 
-def remote(srv):
-	with connection_1c.Connection(srv=srv,**parser.args) as conn:
-		answ=conn.cast('ps -C ibsrv --format "pid"').split("\n")
-		if len(answ)>2:
-			for k in range(1,len(answ)-1):
-				cmd = 'kill -9 {0}'.format(answ[k])
-				conn.cast(cmd) if answ[k] and not conn.testmode else print(cmd)
+def ibsrv_start_cmd(pach,c_file):
+	return '{ibsrv_pach} -c "{pach}/conf/{basename}.yaml" --data "{pach}/{basename}_wdr" --daemon'.format(
+				ibsrv_pach=settings_1c.Settings().ibsrv_pach["deb"]
+				,pach=pach
+				,basename=c_file.replace(".yaml",""))
 
-		ftp = conn.ssh.open_sftp()
-		for c_file in ftp.listdir("{pach}/conf".format(pach=parser.args["pach"][0])):
-			basename = c_file.replace(".yaml","")
-			cmd = '{ibsrv_pach} -c "{pach}/conf/{basename}.yaml" --data "{pach}/{basename}_wdr" --daemon'.format(
-				ibsrv_pach=conn.ibsrv_pach
-				,pach=parser.args["pach"][0]
-				,basename=basename)
-			conn.cast(cmd) if not conn.testmode else print(cmd)
-		if ftp: ftp.close() 
+def ibsrv_start_cmd_list(pach,source):
+	return [ibsrv_start_cmd(pach,c_file) for c_file in source.listdir("{0}/conf".format(pach))]
 
 
-def local():
-	answ=os.popen('ps -C ibsrv --format "pid"').read().split("\n")
+def kill_list(answ):
 	if len(answ)>2:
-		for k in range(1,len(answ)-1):
-			cmd = 'kill -9 {0}'.format(answ[k])
-			os.system(cmd) if answ[k] and not conn.testmode else print(cmd)
+		return ['kill -9 {0}'.format(answ[k]) for k in range(1,len(answ)-1)]
+	else:
+		return []	
 
-	for c_file in os.listdir("{pach}/conf".format(pach=parser.args["pach"][0])):
-		basename = c_file.replace(".yaml","")
-		cmd = '{ibsrv_pach} -c "{pach}/conf/{basename}.yaml" --data "{pach}/{basename}_wdr" --daemon'.format(
-			ibsrv_pach=conn.ibsrv_pach
-			,pach=parser.args["pach"][0]
-			,basename=basename)
-		os.system(cmd) if not conn.testmode else print(cmd)
+def remote_run(cmd_list,conn):
+	for cmd in cmd_list:
+		conn.cast(cmd) if not conn.testmode else print(cmd)
+
+
+def local_run(cmd_list,testmode):
+	for cmd in cmd_list:
+		os.system(cmd) if not testmode else print(cmd)
+
+
+def remote(parser):
+	with connection_1c.Connection(srv=parser.s[0],**parser.args) as conn:
+		answ=conn.cast('ps -C ibsrv --format "pid"').split("\n")
+		remote_run(kill_list(answ),conn)
+		ftp = conn.ssh.open_sftp()
+		if ftp: 
+			remote_run(ibsrv_start_cmd_list(parser.args["pach"][0],ftp),conn)
+			ftp.close() 
+
+
+def local(parser):
+	answ=os.popen('ps -C ibsrv --format "pid"').read().split("\n")
+	local_run(kill_list(answ),conn)
+	local_run(ibsrv_start_cmd_list(parser.args["pach"][0],os),parser.args["test"])
 	
 
 if __name__ == "__main__":
@@ -50,5 +57,4 @@ if __name__ == "__main__":
 				nargs="*",type=str, required=True)
 	parser.decode_arg()
 
-	srv = parser.s[0]
-	local() if srv=="localhost" else remote(srv)
+	local(parser) if parser.s[0]=="localhost" else remote(parser)
