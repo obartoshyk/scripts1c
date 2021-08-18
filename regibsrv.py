@@ -27,4 +27,4 @@ with connection_1c.Connection(srv=parser.s[0],**parser.args) as conn:
 			,pach=parser.args["pach"][0]
 			,basename=basename)
 		conn.cast(cmd) if not conn.testmode else print(cmd)
-	if ftp: ftp.close()
+	if ftp: ftp.close() 
