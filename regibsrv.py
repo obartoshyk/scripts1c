@@ -8,10 +8,13 @@ from sets_1c import settings_1c, connection_1c, argparse_1c
 import os, time
 
 def ibsrv_start_cmd(pach,c_file):
-	return '{ibsrv_pach} -c "{pach}/conf/{basename}.yaml" --data "{pach}/{basename}_wdr" --daemon'.format(
-				ibsrv_pach=settings_1c.Settings().ibsrv_pach["deb"]
-				,pach=pach
-				,basename=c_file.replace(".yaml",""))
+	return '{ibsrv_pach} \
+		-c 	"{pach}/conf/{basename}.yaml"  \
+		--data "{pach}/{basename}_wdr"  \
+		--daemon'.format(
+		ibsrv_pach=settings_1c.Settings().ibsrv_pach["deb"],
+		pach=pach,
+		basename=c_file.replace(".yaml", ""))
 
 def ibsrv_start_cmd_list(pach,source):
 	return [ibsrv_start_cmd(pach,c_file) for c_file in source.listdir("{0}/conf".format(pach))]
@@ -35,29 +38,28 @@ def local_run(cmd_list,testmode):
 
 
 def remote(parser):
-	with connection_1c.Connection(srv=parser.s[0],**parser.args) as conn:
+	with connection_1c.Connection(srv=parser.s[0], **parser.args) as conn:
 		answ=conn.cast('ps -C ibsrv --format "pid"').split("\n")
-		remote_run(kill_list(answ),conn)
+		remote_run(kill_list(answ), conn)
 		time.sleep(5)
 		ftp = conn.ssh.open_sftp()
 		if ftp: 
-			remote_run(ibsrv_start_cmd_list(parser.args["pach"][0],ftp),conn)
+			remote_run(ibsrv_start_cmd_list(parser.args["pach"][0], ftp), conn)
 			ftp.close() 
 
 
 def local(parser):
 	answ=os.popen('ps -C ibsrv --format "pid"').read().split("\n")
-	local_run(kill_list(answ),parser.args["test"])
+	local_run(kill_list(answ), parser.args["test"])
 	time.sleep(5)
-	local_run(ibsrv_start_cmd_list(parser.args["pach"][0],os),parser.args["test"])
+	local_run(ibsrv_start_cmd_list(parser.args["pach"][0], os), parser.args["test"])
 	
 
 if __name__ == "__main__":
 	parser =argparse_1c.ArgumentParser_1C("sk",description=__doc__)
-	parser.add_argument('-p','--pach' ,
+	parser.add_argument('-p', '--pach',
 				metavar="pach",
 				help='ibsrv conf pach',
-				nargs="*",type=str, required=True)
+				nargs=1, type=str, required=True)
 	parser.decode_arg()
-
-	local(parser) if parser.s[0]=="localhost" else remote(parser)
+	local(parser) if parser.s[0] == "localhost" else remote(parser)
