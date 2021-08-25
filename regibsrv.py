@@ -43,21 +43,27 @@ def local_run(cmd_list, test_mode):
 
 
 def remote(prs):
+    mode = prs.args["mode"][0]
     with connection_1c.Connection(srv=prs.s[0], **prs.args) as conn:
-        answer = conn.cast('ps -C ibsrv --format "pid"').split("\n")
-        remote_run(kill_list(answer), conn)
-        time.sleep(5)
-        ftp = conn.ssh.open_sftp()
-        if ftp:
-            remote_run(ibsrv_start_cmd_list(prs.args["pach"][0], ftp), conn)
-            ftp.close()
+        if mode != "start":
+            answer = conn.cast('ps -C ibsrv --format "pid"').split("\n")
+            remote_run(kill_list(answer), conn)
+            time.sleep(5)
+        if mode != "stop":
+            ftp = conn.ssh.open_sftp()
+            if ftp:
+                remote_run(ibsrv_start_cmd_list(prs.args["pach"][0], ftp), conn)
+                ftp.close()
 
 
 def local(prs):
-    answer = os.popen('ps -C ibsrv --format "pid"').read().split("\n")
-    local_run(kill_list(answer), prs.args["test"])
-    time.sleep(5)
-    local_run(ibsrv_start_cmd_list(prs.args["pach"][0], os), prs.args["test"])
+    mode = prs.args["mode"][0]
+    if mode != "start":
+        answer = os.popen('ps -C ibsrv --format "pid"').read().split("\n")
+        local_run(kill_list(answer), prs.args["test"])
+        time.sleep(5)
+    if mode != "stop":
+        local_run(ibsrv_start_cmd_list(prs.args["pach"][0], os), prs.args["test"])
 
 
 if __name__ == "__main__":
@@ -66,5 +72,10 @@ if __name__ == "__main__":
                         metavar="pach",
                         help='ibsrv conf pach',
                         nargs=1, type=str, required=True)
+    parser.add_argument('-m', '--mode',
+                        metavar="mode",
+                        help='mode: start/stop/restart',
+                        nargs=1, type=str, required=True)
+
     parser.decode_arg()
     local(parser) if parser.s[0] == "localhost" else remote(parser)
