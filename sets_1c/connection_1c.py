@@ -30,7 +30,6 @@ class Connection(object):
         self.ssh.load_system_host_keys()
         self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
-    @property
     def __enter__(self):
         self.ssh.connect(hostname=self.srv, username='root', key_filename=self.ssh_key)
         self.connected = True

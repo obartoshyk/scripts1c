@@ -3,6 +3,9 @@
 
 """ 
 reg ibsrv daemon from conf on remote server
+usage:
+   mode : start / stop / restart
+   base : basename / all
 """
 from sets_1c import settings_1c, connection_1c, argparse_1c
 import os
@@ -23,11 +26,14 @@ def ibsrv_start_cmd_list(pach, source):
     return [ibsrv_start_cmd(pach, c_) for c_ in source.listdir("{0}/conf".format(pach))]
 
 
-def kill_list(answer):
-    if len(answer) > 2:
-        return ['kill -9 {0}'.format(answer[k]) for k in range(1, len(answer) - 1)]
-    else:
-        return []
+def kill_list(answer, base):
+    kill_l = []
+    for ans_str in answer:
+        if ans_str.find("grep") == -1 and (base == "all" or ans_str.find(base) != -1):
+            l_ans = list(filter(lambda x: True if x else False, ans_str.split(" ")))
+            if len(l_ans) > 2:
+                kill_l.append('kill -9 {0}'.format(l_ans[1]))
+    return kill_l
 
 
 def remote_run(cmd_list, conn):
@@ -46,28 +52,38 @@ def remote(prs):
     mode = prs.args["mode"][0]
     with connection_1c.Connection(srv=prs.s[0], **prs.args) as conn:
         if mode != "start":
-            answer = conn.cast('ps -C ibsrv --format "pid"').split("\n")
-            remote_run(kill_list(answer), conn)
+            answer = conn.cast('ps aux | grep ibsrv').split("\n")
+            kill_l = kill_list(answer, prs.args["base"][0])
+            remote_run(kill_l, conn)
             time.sleep(5)
         if mode != "stop":
             ftp = conn.ssh.open_sftp()
             if ftp:
-                remote_run(ibsrv_start_cmd_list(prs.args["pach"][0], ftp), conn)
+                if prs.args["base"][0] == "all":
+                    cmdl = ibsrv_start_cmd_list(prs.args["pach"][0], ftp)
+                else:
+                    cmdl = [ibsrv_start_cmd(prs.args["pach"][0], prs.args["base"][0])]
+                remote_run(cmdl, conn)
                 ftp.close()
 
 
 def local(prs):
     mode = prs.args["mode"][0]
     if mode != "start":
-        answer = os.popen('ps -C ibsrv --format "pid"').read().split("\n")
-        local_run(kill_list(answer), prs.args["test"])
+        answer = os.popen('ps aux | grep ibsrv').read().split("\n")
+        kill_l = kill_list(answer, prs.args["base"][0])
+        local_run(kill_l, prs.args["test"])
         time.sleep(5)
     if mode != "stop":
-        local_run(ibsrv_start_cmd_list(prs.args["pach"][0], os), prs.args["test"])
+        if prs.args["base"][0] == "all":
+            cmdl = ibsrv_start_cmd_list(prs.args["pach"][0], os)
+        else:
+            cmdl = [ibsrv_start_cmd(prs.args["pach"][0], prs.args["base"][0])]
+        remote_run(cmdl, prs.args["test"])
 
 
 if __name__ == "__main__":
-    parser = argparse_1c.ArgumentParser_1C("sk", description=__doc__)
+    parser = argparse_1c.ArgumentParser_1C("skb", description=__doc__)
     parser.add_argument('-p', '--pach',
                         metavar="pach",
                         help='ibsrv conf pach',
