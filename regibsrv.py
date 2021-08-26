@@ -36,50 +36,55 @@ def kill_list(answer, base):
     return kill_l
 
 
-def remote_run(cmd_list, conn):
-    for cmd in cmd_list:
-        conn.cast(cmd) if not conn.testmode else print(cmd)
+class IbSrv(object):
+    """ IbSrv server utils"""
 
+    def __init__(self, mode="restart", base="all", pach="", test=True):
+        super(IbSrv, self).__init__()
+        self.test = test
+        self.mode = mode
+        self.base = base
+        self.pach = pach
 
-def local_run(cmd_list, test_mode):
-    for cmd in cmd_list:
-        print("run: {}".format(cmd))
-        if not test_mode:
-            os.system(cmd)
+    def cmd_run(self, cmd_func, cmd_list):
+        for cmd in cmd_list:
+            print("run: {}".format(cmd))
+            if not self.test:
+                cmd_func(cmd)
 
+    def local(self):
+        if self.mode != "start":
+            cmdline = self.local_remote_kill_list(lambda x: os.popen(x).read())
+            self.cmd_run(lambda x: os.system(x), cmdline)
+            if not self.test:
+                time.sleep(5)
+        if self.mode != "stop":
+            cmdline = self.local_remote_start_list(os)
+            self.cmd_run(lambda x: os.system(x), cmdline)
 
-def remote(prs):
-    mode = prs.args["mode"][0]
-    with connection_1c.Connection(srv=prs.s[0], **prs.args) as conn:
-        if mode != "start":
-            answer = conn.cast('ps aux | grep ibsrv').split("\n")
-            kill_l = kill_list(answer, prs.args["base"][0])
-            remote_run(kill_l, conn)
-            time.sleep(5)
-        if mode != "stop":
-            ftp = conn.ssh.open_sftp()
-            if ftp:
-                if prs.args["base"][0] == "all":
-                    cmdl = ibsrv_start_cmd_list(prs.args["pach"][0], ftp)
-                else:
-                    cmdl = [ibsrv_start_cmd(prs.args["pach"][0], prs.args["base"][0])]
-                remote_run(cmdl, conn)
-                ftp.close()
+    def local_remote_kill_list(self, find_cmd):
+        answer = find_cmd('ps aux | grep ibsrv').split("\n")
+        return kill_list(answer, self.base)
 
-
-def local(prs):
-    mode = prs.args["mode"][0]
-    if mode != "start":
-        answer = os.popen('ps aux | grep ibsrv').read().split("\n")
-        kill_l = kill_list(answer, prs.args["base"][0])
-        local_run(kill_l, prs.args["test"])
-        time.sleep(5)
-    if mode != "stop":
-        if prs.args["base"][0] == "all":
-            cmdl = ibsrv_start_cmd_list(prs.args["pach"][0], os)
+    def local_remote_start_list(self, source):
+        if self.base == "all":
+            cmdlist = ibsrv_start_cmd_list(self.pach, source)
         else:
-            cmdl = [ibsrv_start_cmd(prs.args["pach"][0], prs.args["base"][0])]
-        local_run(cmdl, prs.args["test"])
+            cmdlist = [ibsrv_start_cmd(self.pach, self.base)]
+        return cmdlist
+
+    def remote(self, con):
+        if self.mode != "start":
+            cmdlist = self.local_remote_kill_list(lambda x: con.cast(x))
+            self.cmd_run(lambda x: con.cast(x), cmdlist)
+            if not self.test:
+                time.sleep(5)
+        if self.mode != "stop":
+            ftp = con.ssh.open_sftp()
+            if ftp:
+                cmdlist = self.local_remote_start_list(ftp)
+                self.cmd_run(lambda x: con.cast(x), cmdlist)
+                ftp.close()
 
 
 if __name__ == "__main__":
@@ -94,4 +99,15 @@ if __name__ == "__main__":
                         nargs=1, type=str, required=True)
 
     parser.decode_arg()
-    local(parser) if parser.s[0] == "localhost" else remote(parser)
+    params = {"mode": parser.args["mode"][0],
+              "base": parser.args["base"][0],
+              "pach": parser.args["pach"][0],
+              "test": parser.args["test"]}
+
+    oIbSrv = IbSrv(**params)
+
+    if parser.s[0] == "localhost":
+        oIbSrv.local()
+    else:
+        with connection_1c.Connection(srv=parser.s[0], **parser.args) as conn:
+            oIbSrv.remote(conn)
