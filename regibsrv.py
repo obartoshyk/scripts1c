@@ -79,7 +79,7 @@ def local(prs):
             cmdl = ibsrv_start_cmd_list(prs.args["pach"][0], os)
         else:
             cmdl = [ibsrv_start_cmd(prs.args["pach"][0], prs.args["base"][0])]
-        remote_run(cmdl, prs.args["test"])
+        local_run(cmdl, prs.args["test"])
 
 
 if __name__ == "__main__":
