@@ -29,7 +29,7 @@ def ibsrv_start_cmd_list(pach, source):
 def kill_list(answer, base):
     kill_l = []
     for ans_str in answer:
-        if ans_str.find("grep") == -1 and (base == "all" or ans_str.find(base) != -1):
+        if ans_str.find("grep") == -1 and (base == "all" or ans_str.find("{0}_wdr".format(base)) != -1):
             l_ans = list(filter(lambda x: True if x else False, ans_str.split(" ")))
             if len(l_ans) > 2:
                 kill_l.append('kill -9 {0}'.format(l_ans[1]))
