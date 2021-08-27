@@ -56,7 +56,7 @@ class IbSrv(object):
         if self.mode != "start":
             cmdline = self.local_remote_kill_list(lambda x: os.popen(x).read())
             self.cmd_run(lambda x: os.system(x), cmdline)
-            if not self.test:
+        if self.mode == "restart" and not self.test:
                 time.sleep(5)
         if self.mode != "stop":
             cmdline = self.local_remote_start_list(os)
@@ -77,7 +77,7 @@ class IbSrv(object):
         if self.mode != "start":
             cmdlist = self.local_remote_kill_list(lambda x: con.cast(x))
             self.cmd_run(lambda x: con.cast(x), cmdlist)
-            if not self.test:
+        if self.mode == "restart" and not self.test:
                 time.sleep(5)
         if self.mode != "stop":
             ftp = con.ssh.open_sftp()
