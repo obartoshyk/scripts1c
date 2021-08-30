@@ -38,6 +38,7 @@ with connection_1c.Connection(srv=parser.s[0],**parser.args) as conn:
 		print("\n".join(st))
 	else:
 		conf_file ="/etc/zabbix/zabbix_agentd.d/userparameter_mysql.conf"
+		#conf_file = "/home/userparameter_mysql.conf"
 		ftp = conn.ssh.open_sftp()
 		ftp.putfo(BytesIO("\n".join(st).encode()), conf_file)
 		if ftp: ftp.close()
