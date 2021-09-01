@@ -39,10 +39,9 @@ def kill_list(answer, base):
 class IbSrv(object):
     """ IbSrv server utils"""
 
-    def __init__(self, mode="restart", base="all", pach="", test=True):
+    def __init__(self, base="all", pach="", test=True):
         super(IbSrv, self).__init__()
         self.test = test
-        self.mode = mode
         self.base = base
         self.pach = pach
 
@@ -52,13 +51,13 @@ class IbSrv(object):
             if not self.test:
                 cmd_func(cmd)
 
-    def local(self):
-        if self.mode != "start":
+    def local(self, mode):
+        if mode != "start":
             cmdline = self.local_remote_kill_list(lambda x: os.popen(x).read())
             self.cmd_run(lambda x: os.system(x), cmdline)
-        if self.mode == "restart" and not self.test:
-                time.sleep(5)
-        if self.mode != "stop":
+        if mode == "restart" and not self.test:
+            time.sleep(5)
+        if mode != "stop":
             cmdline = self.local_remote_start_list(os)
             self.cmd_run(lambda x: os.system(x), cmdline)
 
@@ -73,13 +72,13 @@ class IbSrv(object):
             cmdlist = [ibsrv_start_cmd(self.pach, self.base)]
         return cmdlist
 
-    def remote(self, con):
-        if self.mode != "start":
+    def remote(self, mode, con):
+        if mode != "start":
             cmdlist = self.local_remote_kill_list(lambda x: con.cast(x))
             self.cmd_run(lambda x: con.cast(x), cmdlist)
-        if self.mode == "restart" and not self.test:
-                time.sleep(5)
-        if self.mode != "stop":
+        if mode == "restart" and not self.test:
+            time.sleep(5)
+        if mode != "stop":
             ftp = con.ssh.open_sftp()
             if ftp:
                 cmdlist = self.local_remote_start_list(ftp)
@@ -99,15 +98,14 @@ if __name__ == "__main__":
                         nargs=1, type=str, required=True)
 
     parser.decode_arg()
-    params = {"mode": parser.args["mode"][0],
-              "base": parser.args["base"][0],
+    params = {"base": parser.args["base"][0],
               "pach": parser.args["pach"][0],
               "test": parser.args["test"]}
-
+    mode = parser.args["mode"][0]
     oIbSrv = IbSrv(**params)
 
     if parser.s[0] == "localhost":
-        oIbSrv.local()
+        oIbSrv.local(mode)
     else:
         with connection_1c.Connection(srv=parser.s[0], **parser.args) as conn:
-            oIbSrv.remote(conn)
+            oIbSrv.remote(mode, conn)
