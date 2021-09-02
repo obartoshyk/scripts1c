@@ -28,7 +28,6 @@ class IbCmd(object):
     def run(self, cmd0, *args):
         cmd = self.create_cmd(cmd0, *args)
         if not self.test:
-           #print("run: {}".format(cmd))
            self.cmd_func(cmd)
         else:
            print("run(TEST): {}".format(cmd))

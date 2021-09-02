@@ -36,8 +36,7 @@ with connection_1c.Connection(srv=parser.s[0], **parser.args) as conn:
         print("uploading to {}".format(parser.s[0]))
         ftp.put(tmpfile, tmpfile)
         os.remove(tmpfile)
-    else:
-        ftp = False
+
     oIbSrv = regibsrv.IbSrv(base=parser.args["base"][0],
                             pach=parser.args["sandbox"][0],
                             test=parser.args["test"])
@@ -50,6 +49,6 @@ with connection_1c.Connection(srv=parser.s[0], **parser.args) as conn:
     rIbCmd.run("infobase config load", tmpfile)
     rIbCmd.run("infobase config apply", "--force")
     oIbSrv.remote("start", conn)
-    if ftp:
+    if not conn.testmode:
         ftp.remove(tmpfile)
         ftp.close()
