@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 """upload .cf from local to sandbox"""
 
-from sets_1c import ibcmd
+from utils_1c import ibcmd
 from sets_1c import settings_1c
 from sets_1c import connection_1c
 from sets_1c import argparse_1c
@@ -24,8 +24,7 @@ sandbox = "{}/{}".format(parser.args["sandbox"][0], parser.b[0])
 cmdmn = ibcmd.IbCmd(
     cmd_func=lambda x: os.system(x),
     bparams=ibcmd.get_file_bparams(parser.args["pach"][0]),
-    platform="deb",
-    test=parser.args["test"])
+    platform="deb")
 
 tmpfile = settings_1c.FileManager().tmpf("/tmp", parser.b[0], "cf")
 cmdmn.run("infobase config save", tmpfile)
@@ -43,8 +42,7 @@ with connection_1c.Connection(srv=parser.s[0], **parser.args) as conn:
     rIbCmd = ibcmd.IbCmd(
         cmd_func=lambda x: conn.cast(x),
         bparams=ibcmd.get_file_bparams(sandbox),
-        platform="deb",
-        test=parser.args["test"])
+        platform="deb")
     oIbSrv.remote("stop", conn)
     rIbCmd.run("infobase config load", tmpfile)
     rIbCmd.run("infobase config apply", "--force")
