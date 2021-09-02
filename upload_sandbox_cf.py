@@ -6,6 +6,7 @@ from utils_1c import ibcmd
 from sets_1c import settings_1c
 from sets_1c import connection_1c
 from sets_1c import argparse_1c
+from utils_1c import comand_runner
 import regibsrv
 import os
 
@@ -21,14 +22,16 @@ parser.add_argument('-n', '--sandbox',
 parser.decode_arg()
 sandbox = "{}/{}".format(parser.args["sandbox"][0], parser.b[0])
 
-cmdmn = ibcmd.IbCmd(
-    cmd_func=lambda x: os.system(x),
-    bparams=ibcmd.get_file_bparams(parser.args["pach"][0]),
-    platform="deb")
+platform = "deb"
+sets = settings_1c.Settings()
+ibcmd_pach = sets.ibcmd_pach[platform]
+ibcmd = comand_runner.Runner('--db-path={}'.format(parser.args["pach"][0]),
+                            cmd_func=lambda x: os.system(x),
+                            cmd_pach=ibcmd_pach)
 
 tmpfile = settings_1c.FileManager().tmpf("/tmp", parser.b[0], "cf")
-cmdmn.run("infobase config save", tmpfile)
-
+ibcmd.run("infobase config save", tmpfile)
+"""
 with connection_1c.Connection(srv=parser.s[0], **parser.args) as conn:
     if not conn.testmode:
         ftp = conn.ssh.open_sftp()
@@ -49,4 +52,4 @@ with connection_1c.Connection(srv=parser.s[0], **parser.args) as conn:
     oIbSrv.remote("start", conn)
     if not conn.testmode:
         ftp.remove(tmpfile)
-        ftp.close()
+        ftp.close()"""
