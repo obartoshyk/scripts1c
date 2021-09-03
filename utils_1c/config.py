@@ -56,7 +56,7 @@ class Config(comand_1c.CommandMaker):
 if __name__ == "__main__":
     from sets_1c import argparse_1c
 
-    parser = argparse_1c.ArgumentParser_1C("sbk", description=__doc__)
+    parser = argparse_1c.ArgumentParser_1C("sbkd", description=__doc__)
     parser.add_argument('-m', '--method',
                         metavar="MTD",
                         help='save/export/load/import',
@@ -84,12 +84,19 @@ if __name__ == "__main__":
         lConfig.config_run(parser.args["method"][0], parser.args["pach"][0])
     else:
         from sets_1c import connection_1c
-
         with connection_1c.Connection(srv=parser.s[0], **parser.args) as conn:
             if parser.args["test"]:
-                def cmd_func(x):
-                    print(x)
+                def cmd_func(x): print(x)
             else:
-                def cmd_func(x):
-                    conn.cast(x)
-            remote_base = basedata.IbcmdPostgresBase(parser.b[0])
+                def cmd_func(x): conn.cast(x)
+            remote_base = basedata.IbcmdPostgresBase(
+                srv=parser.s[0],
+                base=parser.b[0],
+                db_usr=parser.db_usr,
+                db_pwd=parser.db_pwd
+            )
+            lConfig = Config(*remote_base.getparams(),
+                             cmd_func=cmd_func,
+                             platform=parser.args["platform"])
+            lConfig.config_run(parser.args["method"][0], parser.args["pach"][0])
+
