@@ -1,14 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
-from . import comand_runner
+import os
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+
+from sets_1c import comand_1c
 
 
-class BaseLock(comand_runner.Runner):
+class BaseLock(comand_1c.Runner):
     """block base to make safe backup"""
 
-    def __init__(self, *args, cmd_func=lambda x: print(x), cmd_pach="TEST_PACH"):
+    def __init__(self, *args, **kwargs):
         super(BaseLock, self).__init__()
-        comand_runner.Runner.__init__(self, *args, cmd_func=cmd_func, cmd_pach=cmd_pach)
+        comand_1c.Runner.__init__(self, *args, **kwargs)
         self.locked = False
 
     def __enter__(self):
