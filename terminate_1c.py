@@ -3,7 +3,7 @@
 """ 
 terminate 1C current client sessions, it is working only on deb servers for now 
 """
-from sets_1c import settings_1c, connection_1c, argparse_1c
+from sets_1c import connection_1c, argparse_1c
 
 def terminate(sm, base, c):
 	if c:
@@ -11,11 +11,13 @@ def terminate(sm, base, c):
 	else:
 		sm.terminate_all(base)
 
+
 if __name__ == "__main__":
-	parser =argparse_1c.ArgumentParser_1C("SBCk",description=__doc__) 
+	parser = argparse_1c.ArgumentParser_1C("SBCk", description=__doc__)
 	parser.decode_arg()
 	if not(parser.args["base"]) and not(parser.args["client"]):
 		raise "I can`t ruin everything again!"
+
 
 	for srv in parser.s:
 		with connection_1c.Connection(srv=srv,**parser.args) as conn:

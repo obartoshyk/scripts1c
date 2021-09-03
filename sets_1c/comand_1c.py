@@ -19,7 +19,7 @@ class Runner(RunnerParams):
 
     def run(self, cmd0, *args):
         cmd = self.create_cmd(self.cmd_pach, cmd0, *self.getparams(), *args)
-        self.cmd_func(cmd)
+        return self.cmd_func(cmd)
 
     @staticmethod
     def create_cmd(*args):

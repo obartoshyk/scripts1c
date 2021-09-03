@@ -1,29 +1,31 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
-import os
-import sys
-sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
-
-from sets_1c import comand_1c
-
-
-class BaseLock(comand_1c.Runner):
+class BaseLock(object):
     """block base to make safe backup"""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, server1c, base, usr, pwd):
         super(BaseLock, self).__init__()
-        comand_1c.Runner.__init__(self, *args, **kwargs)
+        self.server = server1c
+        self.base = base
         self.locked = False
+        self.usr = usr
+        self.pwd = pwd
 
-    def __enter__(self):
-        cmd = " --sessions-deny=on --scheduled-jobs-deny=on"
-        cmd = cmd + '--denied-message="BaseLock in progress"'
-        self.run("infobase", cmd)
+    def __enter__(self, base, usr, pwd):
+        cmd = "infobase --cluster={cluster} update --infobase={infobase}"
+        cmd = cmd + " --infobase-user={} --infobase-pwd={}".format(self.usr, self.pwd)
+        cmd = cmd + " --sessions-deny=on --scheduled-jobs-deny=on"
+        cmd = cmd + '--denied-message="backup in progress"'
+        cmd = cmd.format(**self.server.get_base(self.base))
+        self.server.run(cmd)
         self.locked = True
         return self
 
     def __exit__(self, type1, value, traceback):
         if self.locked:
-            cmd = " --sessions-deny=off --scheduled-jobs-deny=off"
-            self.run(cmd)
+            cmd = "infobase --cluster={cluster} update --infobase={infobase}"
+            cmd = cmd + " --infobase-user={} --infobase-pwd={}".format(self.usr, self.pwd)
+            cmd = cmd + " --sessions-deny=off --scheduled-jobs-deny=off"
+            cmd = cmd.format(**self.server.get_base(self.base))
+            self.server.run(cmd)
             self.locked = False

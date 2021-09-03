@@ -53,8 +53,7 @@ class Connection(object):
         if err:
             self.err = err
             print("cast error: {}".format(err))
-        if self.testmode:
-            print("data: {0}".format(data))
+        #print("data: {0}".format(data))
         return data
 
     def rac(self, *args):
@@ -117,16 +116,7 @@ class Connection(object):
                 cur_base["cluster"] = cluster
                 self.bases_dict[cur_base["name"]] = cur_base
 
-    def regras(self):
-        answ = self.cast('ps -C ras --format "pid"').split("\n")
-        if len(answ) > 2:
-            for k in range(1, len(answ) - 1):
-                print("pid:" + answ[k])
-                if not self.testmode:
-                    self.cast('kill{0}'.format(answ[k]))
-        if not self.testmode:
-            self.cast("{0} --daemon cluster".format(self.ras_pach))
-            self.init_ras = True
+
 
 
 class SessionManager(object):

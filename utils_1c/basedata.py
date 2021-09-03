@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
+import os
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
 from sets_1c import comand_1c
 
@@ -19,3 +22,4 @@ class IbcmdPostgresBase(comand_1c.RunnerParams):
         self.bparams.append("--db-name=" + base)
         self.bparams.append("--db-user=" + db_usr)
         self.bparams.append("--db-pwd=" + db_pwd)
+
