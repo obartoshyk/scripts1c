@@ -4,6 +4,7 @@
 from sets_1c import comand_1c
 import socket
 
+
 class IbcmdFileBase(comand_1c.RunnerParams):
     def __init__(self, cat_pach=""):
         super(IbcmdFileBase, self).__init__()
@@ -12,7 +13,7 @@ class IbcmdFileBase(comand_1c.RunnerParams):
 
 class IbcmdPostgresBase(comand_1c.RunnerParams):
     def __init__(self, srv="", base="", usr="", pwd=""):
-        super(IbcmdFileBase, self).__init__()
+        super(IbcmdPostgresBase, self).__init__()
         self.bparams = ["--dbms=postgresql"]
         self.bparams.append("--db-server=" + socket.gethostbyname(srv))
         self.bparams.append("--db-name=" + base)
