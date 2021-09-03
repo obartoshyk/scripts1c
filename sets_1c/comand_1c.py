@@ -31,4 +31,3 @@ class CommandMaker(Runner):
         sets = settings_1c.Settings()
         cmd_pach = getattr(sets, "{}_pach".format(command))[platform]
         Runner.__init__(self, *args, **kwargs, cmd_pach=cmd_pach)
-        print(args)
