@@ -11,5 +11,13 @@ scripts:
 **** repack client distr after update version 1C and sent to srv
 ./repack_1cdistr.py -r -p %distr_pach%(+ add v.1C) -k %ssh_pach%/.ssh/id_rsa -s SRV1 SRV2 -t 
 
-**** terminate 1C current client sessions
-./terminate_1c.py -s SRV1 SRV2 -b BASE1 BASE2 -c CLIENT1 CLIENT2 -k %ssh_pach%/.ssh/id_rsa -t 
+**** utils_1c.sessionmanager - terminate current sessions on server
+./sessionmanager.py -s SRV1 SRV2 -b BASE1 BASE2 -c CLIENT1 CLIENT2 -k %ssh_pach%/.ssh/id_rsa -t
+
+**** utils_1c.baselock - block/unblock of 1C base 
+./baselock.py -s SRV1 -b BASE1 -u USER:PASSWORD -k %ssh_pach%/.ssh/id_rsa -m block/unblock -t
+
+**** utils_1c.config - creation of config backup 
+./baselock.py -s SRV1 -b BASE1 -d USER:PASSWORD -k %ssh_pach%/.ssh/id_rsa -m save/load/export/import -t
+
+
