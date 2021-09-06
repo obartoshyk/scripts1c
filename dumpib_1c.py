@@ -13,7 +13,7 @@ fm = settings_1c.FileManager()
 fm.init_bkp_pach(parser.args["pach"][0])
 srv=parser.s[0]
 print("***{} starting backup {}".format(settings_1c.str_cur_time(),srv))	
-with connection_1c.Connection(srv=srv,**parser.args) as conn:
+with connection_1c.Connection(srv=srv, **parser.args) as conn:
 
 	sm = connection_1c.SessionManager(conn)
 	
