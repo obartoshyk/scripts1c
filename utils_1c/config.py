@@ -16,6 +16,7 @@ class Config(comand_1c.CommandMaker):
         config save : backup base config, block base before
         config import
         config export
+        config export --sync
         config apply --force
     """
 
