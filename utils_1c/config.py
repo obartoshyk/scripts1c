@@ -31,6 +31,9 @@ class Config(comand_1c.CommandMaker):
     def config_load(self, tmpfile):
         self.run("infobase config load", tmpfile)
 
+    def config_export_sync(self, tmpfile):
+        self.run("infobase config export", "--sync", tmpfile)
+
     def config_export(self, tmpfile):
         self.run("infobase config export", tmpfile)
 
@@ -44,6 +47,7 @@ class Config(comand_1c.CommandMaker):
         methods = {
             "save": ["config_save"],
             "load": ["config_load", "config_apply"],
+            "export_sync": ["config_export_sync"],
             "export": ["config_export"],
             "import": ["config_import", "config_apply"]
         }
