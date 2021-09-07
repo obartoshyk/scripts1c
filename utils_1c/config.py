@@ -35,7 +35,10 @@ class Config(comand_1c.CommandMaker):
         self.run("infobase config export", "--sync", tmpfile)
 
     def config_export(self, tmpfile):
-        self.run("infobase config export", tmpfile)
+        if os.listdir(tmpfile):
+            self.config_export_sync(tmpfile)
+        else:
+            self.run("infobase config export", tmpfile)
 
     def config_import(self, tmpfile):
         self.run("infobase config import", tmpfile)
@@ -103,4 +106,3 @@ if __name__ == "__main__":
                              cmd_func=cmd_func,
                              platform=parser.args["platform"])
             lConfig.config_run(parser.args["method"][0], parser.args["pach"][0])
-
