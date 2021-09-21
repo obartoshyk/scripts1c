@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
+
+
 class BaseLock(object):
+
     """block base to make safe backup"""
 
     def __init__(self, server1c, base, usr, pwd):
@@ -39,6 +42,9 @@ class BaseLock(object):
 
 
 if __name__ == "__main__":
+    import sys
+    import os
+    sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
     from sets_1c import argparse_1c
     from sets_1c import connection_1c
     from utils_1c import server
