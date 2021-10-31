@@ -18,14 +18,19 @@ class ArgumentParser_1C(argparse.ArgumentParser):
         self.add_user()
         self.add_d()
         self.add_k()
+        self.args = {}
 
     def decode_arg(self):
         args = vars(self.parse_args())
+        for k, v in args.items():
+            self.args[k] = v
+        cfg_file = self.args.get("cfg_file")
+        if cfg_file:
+            self.decode_cfg(cfg_file)
         self.decode_args(args)
         return args
 
     def decode_args(self, args):
-        self.args = args
         self.decode_b(args)
         self.decode_s(args)
         self.decode_c(args)
@@ -122,6 +127,11 @@ class ArgumentParser_1C(argparse.ArgumentParser):
     def decode_d(self, args):
         if self.modeline.find("d") != -1:
             self.db_usr, self.db_pwd = args['db_user'][0].split(":")
+
+    def decode_cfg(self, cfg_file):
+        with open(cfg_file, 'r') as cfile:
+            for line in cfile.read().splitlines():
+              print(line)
 
 
 if __name__ == "__main__":
