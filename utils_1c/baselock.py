@@ -22,24 +22,29 @@ class BaseLock(object):
         self.unblock()
 
     def block(self):
-        cmd = "infobase --cluster={cluster} update --infobase={infobase}"
-        cmd = cmd + " --infobase-user={} --infobase-pwd={}".format(self.usr, self.pwd)
-        cmd = cmd + " --sessions-deny=on --scheduled-jobs-deny=on"
-        cmd = cmd + '--denied-message="backup in progress"'
-        cmd = cmd.format(**self.server.get_base(self.base))
-        self.server.run(cmd)
-        self.locked = True
-        return self
+        print(self.server.get_bases())
+        return self.base
+        #cmd = "infobase --cluster={cluster} update --infobase={infobase}"
+        #cmd = cmd + " --infobase-user={} --infobase-pwd={}".format(self.usr, self.pwd)
+        #cmd = cmd + " --sessions-deny=on --scheduled-jobs-deny=on"
+        #cmd = cmd + '--denied-message="backup in progress"'
+        #cmd = cmd.format(**self.server.get_base(self.base))
+        #self.server.run(cmd)
+        #self.locked = True
+        #return self
 
     def unblock(self):
-        if self.locked:
             cmd = "infobase --cluster={cluster} update --infobase={infobase}"
             cmd = cmd + " --infobase-user={} --infobase-pwd={}".format(self.usr, self.pwd)
             cmd = cmd + " --sessions-deny=off --scheduled-jobs-deny=off"
             cmd = cmd.format(**self.server.get_base(self.base))
             self.server.run(cmd)
+            print(cmd)
             self.locked = False
 
+    def runmethod(self, method):
+        cmd_method = getattr(self, method)
+        cmd_method()
 
 if __name__ == "__main__":
     import sys
@@ -53,19 +58,17 @@ if __name__ == "__main__":
     parser.add_argument('-m', '--method',
                         metavar="MTD",
                         help='block/unblock',
-                        nargs=1, type=str, default="save", required=False)
+                        nargs=1, type=str, default="block", required=False)
+    parser.add_argument('-f', '--platform',
+                        metavar="DEB",
+                        help='deb/win',
+                        nargs=1, type=str, default="deb", required=False)
+
     parser.decode_arg()
+    print("BaseLock: {}".format(parser.args["method"][0]))
     with connection_1c.Connection(srv=parser.s[0], **parser.args) as conn:
-        if parser.args["test"]:
-            def cmd_func(x):
-                print(x)
-        else:
-            def cmd_func(x):
-                conn.cast(x)
-        Server = server.Server(cmd_func=cmd_func,
-                               platform=parser.args["platform"])
-        bl = BaseLock(Server, parser.b[0], parser.usr, parser.pwd)
-        if parser.args["method"] == "block":
-            bl.block()
-        else:
-            bl.unblock()
+        bl = BaseLock(server.Server(cmd_func=conn.cast,
+                                    platform=parser.args["platform"]),
+                                    parser.b[0], parser.usr, parser.pwd)
+        bl.runmethod(parser.args["method"][0])
+

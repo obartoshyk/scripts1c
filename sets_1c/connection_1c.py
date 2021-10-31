@@ -3,14 +3,15 @@
 
 import paramiko
 import socket
+import os
 from . import settings_1c
 
 
-class Connection(object):
+class RemoteConnection(object):
     """ Connection to 1C servers uses paramiko"""
 
     def __init__(self, srv="", ssh_key="", test=False, **kwargs):
-        super(Connection, self).__init__()
+        super(RemoteConnection, self).__init__()
         sets = settings_1c.Settings()
         self.testmode = test
         self.srv = srv
@@ -62,7 +63,7 @@ class Connection(object):
         if self.err and not self.init_ras:
             self.init_ras = True
             self.err = ""
-            self.regras()
+            #self.regras()
             return self.cast(cmd)
         return data
 
@@ -223,3 +224,35 @@ class IbcmdManager(object):
          """
         cmd = " ".join(["infobase", command, *self.bparams, file_pach])
         return self.make_req(cmd)
+
+
+class LocalConnection(object):
+    def __init__(self):
+        super(LocalConnection, self).__init__()
+
+    def __enter__(self):
+        pass
+
+    def __exit__(self, type1, value, traceback):
+        pass
+
+    def cast(self, cmd):
+        print("cast {0}: {1}".format("LocalHost", cmd))
+        data = os.popen(cmd).read()
+        return data
+
+class Connection(object):
+    def __init__(self, srv="", **kwargs):
+        super(Connection, self).__init__()
+        if srv == "localhost":
+            self.connection = LocalConnection()
+        else:
+            self.connection = RemoteConnection(**kwargs)
+
+
+    def __enter__(self):
+       conn = self.connection
+       return conn
+
+    def __exit__(self, type1, value, traceback):
+        pass
