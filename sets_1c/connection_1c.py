@@ -2,7 +2,6 @@
 # -*- coding: UTF-8 -*-
 
 import paramiko
-import socket
 import os
 from . import settings_1c
 
@@ -64,7 +63,8 @@ class LocalConnection(object):
     def __exit__(self, type1, value, traceback):
         pass
 
-    def cast(self, cmd):
+    @staticmethod
+    def cast(cmd):
         print("cast {0}: {1}".format("LocalHost", cmd))
         data = os.popen(cmd).read()
         return data
