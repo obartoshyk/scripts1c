@@ -2,9 +2,10 @@
 # -*- coding: UTF-8 -*-
 import os
 import sys
-sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
+sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 from sets_1c import comand_1c
+from utils_1c import basedata
 
 
 class Server(comand_1c.CommandMaker):
@@ -38,6 +39,11 @@ class Server(comand_1c.CommandMaker):
     def get_base(self, base):
         return self.get_bases()[base]
 
+    def get_clbase(self, base, usr, pwd):
+        cur_base = self.get_base(base)
+        return basedata.ClusterBase(cluster=cur_base["cluster"],
+                                    base=cur_base["infobase"],
+                                    usr=usr, pwd=pwd)
 
     @staticmethod
     def takekeys(s0):

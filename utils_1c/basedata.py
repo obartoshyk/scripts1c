@@ -2,6 +2,7 @@
 # -*- coding: UTF-8 -*-
 import os
 import sys
+import socket
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
 from sets_1c import comand_1c
@@ -16,10 +17,20 @@ class IbcmdFileBase(comand_1c.RunnerParams):
 class IbcmdPostgresBase(comand_1c.RunnerParams):
     def __init__(self, srv="", base="", db_usr="", db_pwd=""):
         super(IbcmdPostgresBase, self).__init__()
-        import socket
         self.bparams = ["--dbms=postgresql"]
+        print("getting srv")
+        print(srv)
+        print(  socket.gethostbyname(srv))
         self.bparams.append("--db-server=" + socket.gethostbyname(srv))
         self.bparams.append("--db-name=" + base)
         self.bparams.append("--db-user=" + db_usr)
         self.bparams.append("--db-pwd=" + db_pwd)
 
+
+class ClusterBase(object):
+    def __init__(self, cluster="", base="", usr="", pwd=""):
+        super(ClusterBase, self).__init__()
+        self.cluster = cluster
+        self.base = base
+        self.usr = usr
+        self.pwd = pwd

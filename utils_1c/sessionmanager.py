@@ -3,7 +3,7 @@
 class SessionManager(object):
     """terminate base or server sessions"""
 
-    def __init__(self, server1c):
+    def __init__(self, server1c) -> object:
         super(SessionManager, self).__init__()
         self.server = server1c
 
