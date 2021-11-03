@@ -3,7 +3,7 @@
 class SessionManager(object):
     """terminate base or server sessions"""
 
-    def __init__(self, server1c) -> object:
+    def __init__(self, server1c):
         super(SessionManager, self).__init__()
         self.server = server1c
 
@@ -74,4 +74,3 @@ if __name__ == "__main__":
                     cmd_func=cmd_func,
                     platform=parser.args["platform"]))
                 terminate(sm, parser.b, parser.c)
-
