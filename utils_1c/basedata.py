@@ -18,9 +18,6 @@ class IbcmdPostgresBase(comand_1c.RunnerParams):
     def __init__(self, srv="", base="", db_usr="", db_pwd=""):
         super(IbcmdPostgresBase, self).__init__()
         self.bparams = ["--dbms=postgresql"]
-        print("getting srv")
-        print(srv)
-        print(  socket.gethostbyname(srv))
         self.bparams.append("--db-server=" + socket.gethostbyname(srv))
         self.bparams.append("--db-name=" + base)
         self.bparams.append("--db-user=" + db_usr)
