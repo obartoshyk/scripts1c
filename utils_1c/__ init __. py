@@ -1,4 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 
-__all__ = ['basedata', 'baselock', 'config', 'sessionmanager']
+__all__ = ['argparse_1c',
+           'basedata',
+           'baselock',
+           'comand_1c',
+           'config',
+           'connection_1c',
+           'server',
+           'sessionmanager',
+           'settings_1c'
+           ]

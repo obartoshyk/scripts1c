@@ -1,13 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
-import sys
-import os
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
-from sets_1c import argparse_1c
-from sets_1c import comand_1c
-from sets_1c import connection_1c
-from utils_1c import server
+from . import server, comand_1c, connection_1c, argparse_1c
 
 
 class LockCommandMaker(object):

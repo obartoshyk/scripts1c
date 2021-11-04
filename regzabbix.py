@@ -4,7 +4,7 @@
 """ 
 reg zabbix agent after update version 1C 
 """
-from sets_1c import settings_1c, connection_1c, argparse_1c
+from utils_1c import settings_1c, connection_1c, argparse_1c
 from io import BytesIO
 
 parser =argparse_1c.ArgumentParser_1C("sk",description=__doc__)

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
-from sets_1c import argparse_1c, settings_1c, connection_1c, comand_1c
-from utils_1c import sessionmanager, baselock, server, basedata
+from utils_1c import argparse_1c, settings_1c
+from utils_1c import sessionmanager, baselock, server, basedata, comand_1c, connection_1c
 
 parser = argparse_1c.ArgumentParser_1C("sBudk", description=__doc__)
 parser.add_argument('-p', '--pach',

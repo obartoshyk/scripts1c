@@ -1,11 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
-import os
-import sys
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
-from sets_1c import comand_1c
-from utils_1c import basedata
+from . import basedata, comand_1c
 
 
 class Server(comand_1c.CommandMaker):

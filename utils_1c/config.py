@@ -2,13 +2,9 @@
 # -*- coding: UTF-8 -*-
 """upload .cf from local to sandbox"""
 import os
-import sys
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
-
-from sets_1c import settings_1c
-from sets_1c import comand_1c
-import basedata
+from . import settings_1c
+from . import comand_1c
+from . import basedata
 
 
 class Config(comand_1c.CommandMaker):

@@ -1,11 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
-import os
-import sys
 import socket
-sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
-
-from sets_1c import comand_1c
+from . import comand_1c
 
 
 class IbcmdFileBase(comand_1c.RunnerParams):

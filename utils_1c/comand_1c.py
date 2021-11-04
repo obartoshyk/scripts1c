@@ -1,4 +1,4 @@
-from sets_1c import settings_1c
+from . import settings_1c
 
 
 class RunnerParams(object):

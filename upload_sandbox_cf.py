@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 """upload .cf from local to sandbox"""
-
-from utils_1c import config
-from utils_1c import basedata
-from sets_1c import connection_1c
-from sets_1c import argparse_1c
 import regibsrv
 import os
+from utils_1c import config
+from utils_1c import basedata
+from utils_1c import connection_1c
+from utils_1c import argparse_1c
+
 
 parser = argparse_1c.ArgumentParser_1C("sbk", description=__doc__)
 parser.add_argument('-p', '--pach',

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 """ reg 'ras' after update version 1C"""
-from sets_1c import settings_1c, connection_1c, argparse_1c
+from utils_1c import settings_1c, connection_1c, argparse_1c
 
 
 def reg(cast, platform):

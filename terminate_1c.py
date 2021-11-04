@@ -3,7 +3,7 @@
 """ 
 terminate 1C current client sessions, it is working only on deb servers for now 
 """
-from sets_1c import connection_1c, argparse_1c
+from utils_1c import connection_1c, argparse_1c
 
 def terminate(sm, base, c):
 	if c:

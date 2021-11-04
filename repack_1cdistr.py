@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 """repack client distr after update version 1C and sent to srv"""
-import os, sys, shutil
-from sets_1c import settings_1c, argparse_1c
+import os
+import shutil
+from utils_1c import settings_1c, argparse_1c
 
 def send_to_srv(sets,update_sets,srv_list):
 	#scp -r $pach0/$t_name.zip  root@SRV:/root/install/$t_name.zip

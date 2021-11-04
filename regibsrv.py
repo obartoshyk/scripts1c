@@ -7,9 +7,10 @@ usage:
    mode : start / stop / restart
    base : basename / all
 """
-from sets_1c import settings_1c, connection_1c, argparse_1c
 import os
 import time
+from utils_1c import settings_1c, connection_1c, argparse_1c
+
 
 
 def ibsrv_start_cmd(pach, c_file):

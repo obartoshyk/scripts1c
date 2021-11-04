@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
-
 import paramiko
 import os
-from . import settings_1c
 
 
 class RemoteConnection(object):
@@ -11,15 +9,8 @@ class RemoteConnection(object):
 
     def __init__(self, srv="", **kwargs):
         super(RemoteConnection, self).__init__()
-        sets = settings_1c.Settings()
         self.srv = srv
         self.ssh_key = kwargs["ssh_key"]
-        self.err = ""
-
-        self.rac_pach = sets.rac_pach["deb"]
-        self.ras_pach = sets.ras_pach["deb"]
-        self.ibcmd_pach = sets.ibcmd_pach["deb"]
-        self.ibsrv_pach = sets.ibsrv_pach["deb"]
 
         self.clusters_list = []
         self.bases_dict = {}
@@ -48,9 +39,9 @@ class RemoteConnection(object):
         data = stdout.read().decode()
         err = stderr.read().decode()
         if err:
-            self.err = err
-            print("cast error: {}".format(err))
-        return data
+            raise "cast ERROR: {}".format(err)
+        else:
+            return data
 
 
 class LocalConnection(object):
@@ -79,7 +70,7 @@ class Connection(object):
             self.connection = RemoteConnection(srv=srv, **kwargs)
 
     def __enter__(self):
-       return self.connection.__enter__()
+        return self.connection.__enter__()
 
     def __exit__(self, type1, value, traceback):
         self.connection.__exit__(type1, value, traceback)
