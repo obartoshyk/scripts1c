@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
+import os
+import server
+from utils_1c import connection_1c
+from utils_1c import argparse_1c
+
+
 class SessionManager(object):
     """terminate base or server sessions"""
 
@@ -37,11 +43,6 @@ if __name__ == "__main__":
             else:
                 smanager.terminate_all(base)
 
-    import os
-    import sys
-    import server
-    sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
-    from sets_1c import argparse_1c
 
     parser = argparse_1c.ArgumentParser_1C("SBCk", description=__doc__)
     parser.add_argument('-f', '--platform',
@@ -61,7 +62,6 @@ if __name__ == "__main__":
             platform=parser.args["platform"]))
         terminate(sm, parser.b, parser.c)
     else:
-        from sets_1c import connection_1c
         for srv in parser.s:
             with connection_1c.Connection(srv=srv, **parser.args) as conn:
                 if parser.args["test"]:
