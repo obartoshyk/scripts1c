@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
-import paramiko
 import os
-
+import paramiko
+import socket
+import shutil
 
 class RemoteConnection(object):
     """ Connection to 1C servers uses paramiko"""
@@ -43,6 +44,13 @@ class RemoteConnection(object):
         else:
             return data
 
+    def move_file(self, tmp_dt, dest_dt):
+        ftp = self.ssh.open_sftp()
+        ftp.get(tmp_dt, dest_dt)
+        ftp.remove(tmp_dt)
+        if ftp:
+            ftp.close()
+
 
 class LocalConnection(object):
     def __init__(self):
@@ -55,16 +63,20 @@ class LocalConnection(object):
         pass
 
     @staticmethod
+    def move_file(tmp_dt, dest_dt):
+        shutil.copyfile(tmp_dt, dest_dt)
+        os.remove(tmp_dt)
+
+    @staticmethod
     def cast(cmd):
         print("cast {0}: {1}".format("LocalHost", cmd))
-        data = os.popen(cmd).read()
-        return data
+        return os.system(cmd)
 
 
 class Connection(object):
     def __init__(self, srv="", **kwargs):
         super(Connection, self).__init__()
-        if srv == "localhost":
+        if srv == "localhost" or srv == socket.gethostname():
             self.connection = LocalConnection()
         else:
             self.connection = RemoteConnection(srv=srv, **kwargs)

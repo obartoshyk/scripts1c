@@ -22,10 +22,4 @@ if __name__ == "__main__":
     parser.decode_arg()
     for srv in parser.s:
         with connection_1c.Connection(srv=srv, **parser.args) as conn:
-            if parser.args["test"]:
-                def cmd_func(x):
-                    print(x)
-            else:
-                def cmd_func(x):
-                    conn.cast(x)
-    reg(cmd_func, parser.args["platform"])
+            reg(conn.cast, parser.args["platform"])

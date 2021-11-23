@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
-from . import server, comand_1c, connection_1c, argparse_1c
+from . import comand_1c
 
 
 class LockCommandMaker(object):
@@ -53,30 +53,3 @@ class BaseLock(comand_1c.CommandMaker):
         self.run(self.cmaker.get_unblock())
         self.locked = False
         return self.locked
-
-    def runmethod(self, method):
-        cmd_method = getattr(self, method)
-        cmd_method()
-
-
-if __name__ == "__main__":
-
-    parser = argparse_1c.ArgumentParser_1C("sbuk", description=__doc__)
-    
-    parser.add_argument('-m', '--method',
-                        metavar="MTD",
-                        help='block/unblock',
-                        nargs=1, type=str, default="block", required=False)
-    parser.add_argument('-f', '--platform',
-                        metavar="DEB",
-                        help='deb/win',
-                        nargs=1, type=str, default="deb", required=False)
-
-    parser.decode_arg()
-
-    with connection_1c.Connection(srv=parser.s[0], **parser.args) as conn:
-        server1c = server.Server(cmd_func=conn.cast,
-                                 platform=parser.args["platform"])
-        bl = BaseLock(server1c.get_clbase(parser.b[0], parser.usr, parser.pwd),
-                      cmd_func=conn.cast)
-        bl.runmethod(parser.args["method"][0])

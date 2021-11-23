@@ -1,10 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
-import os
-import server
-from utils_1c import connection_1c
-from utils_1c import argparse_1c
-
 
 class SessionManager(object):
     """terminate base or server sessions"""
@@ -34,43 +29,3 @@ class SessionManager(object):
             if curr_sess["user-name"] in userlist:
                 self.terminate_session(cluster, curr_sess["session"])
 
-
-if __name__ == "__main__":
-    def terminate(smanager, b, c):
-        for base in (b if b else smanager.server.get_bases().keys()):
-            if c:
-                smanager.terminate_sessions(base, c)
-            else:
-                smanager.terminate_all(base)
-
-
-    parser = argparse_1c.ArgumentParser_1C("SBCk", description=__doc__)
-    parser.add_argument('-f', '--platform',
-                        metavar="DEB",
-                        help='deb/win',
-                        nargs=1, type=str, default="deb", required=False)
-    parser.decode_arg()
-    if not (parser.args["base"]) and not (parser.args["client"]):
-        raise "I can`t ruin everything again!"
-    if parser.s[0] == "localhost":
-        if parser.args["test"]:
-            def cmd_func(x): print(x)
-        else:
-            def cmd_func(x): return os.popen(x).read()
-        sm = SessionManager(server.Server(
-            cmd_func=cmd_func,
-            platform=parser.args["platform"]))
-        terminate(sm, parser.b, parser.c)
-    else:
-        for srv in parser.s:
-            with connection_1c.Connection(srv=srv, **parser.args) as conn:
-                if parser.args["test"]:
-                    def cmd_func(x):
-                        print(x)
-                else:
-                    def cmd_func(x):
-                        return conn.cast(x)
-                sm = SessionManager(server.Server(
-                    cmd_func=cmd_func,
-                    platform=parser.args["platform"]))
-                terminate(sm, parser.b, parser.c)

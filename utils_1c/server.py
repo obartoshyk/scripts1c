@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
-from . import basedata, comand_1c
+import basedata
+from . import comand_1c
 
 
 class Server(comand_1c.CommandMaker):
@@ -34,11 +35,11 @@ class Server(comand_1c.CommandMaker):
     def get_base(self, base):
         return self.get_bases()[base]
 
-    def get_clbase(self, base, usr, pwd):
+    def get_clbase(self, base, **kwargs):
         cur_base = self.get_base(base)
         return basedata.ClusterBase(cluster=cur_base["cluster"],
-                                    base=cur_base["infobase"],
-                                    usr=usr, pwd=pwd)
+                                    infobase=cur_base["infobase"],
+                                    usr=kwargs["usr"], pwd=kwargs['pwd'])
 
     @staticmethod
     def takekeys(s0):

@@ -9,7 +9,7 @@ class ArgumentParser_1C(argparse.ArgumentParser):
     def __init__(self, modeline="", **kwargs):
         super(ArgumentParser_1C, self).__init__(**kwargs)
         self.add_argument('-t', '--test', help='Test mode', action='store_true', default=False)
-        self.add_argument('-cfg', '--cfg_file', help='cfg file pach', required=False)
+        self.add_argument('-y', '--yaml_file', help='yaml file pach', required=False)
         self.modeline = modeline
         self.add_b()
         self.add_s()
@@ -23,7 +23,7 @@ class ArgumentParser_1C(argparse.ArgumentParser):
         args = vars(self.parse_args())
         for k, v in args.items():
             self.args[k] = v
-        cfg_file = self.args.get("cfg_file")
+        cfg_file = self.args.get("yaml_file")
         if cfg_file:
             self.decode_cfg(cfg_file)
         self.decode_args(args)
@@ -35,6 +35,13 @@ class ArgumentParser_1C(argparse.ArgumentParser):
         self.decode_c(args)
         self.decode_u(args)
         self.decode_d(args)
+
+    def add_platform(self):
+        if self.modeline.find("f") != -1:
+            self.add_argument('-f', '--platform',
+                              metavar="DEB",
+                              help='deb/win',
+                              nargs=1, type=str, default="deb", required=False)
 
     def add_b(self):
         if self.modeline.find("b") != -1:
@@ -90,12 +97,7 @@ class ArgumentParser_1C(argparse.ArgumentParser):
                               nargs=1, type=str, required=False)
 
     def add_k(self):
-        if self.modeline.find("k") != -1:
-            self.add_argument('-k', '--ssh_key',
-                              metavar="~pach/.ssh/id_rsa",
-                              help='rsa key to ssh connection',
-                              nargs=1, type=str, required=False)
-        if self.modeline.find("K") != -1:
+        if self.modeline.find("k") != -1 or self.modeline.find("K") != -1:
             self.add_argument('-k', '--ssh_key',
                               metavar="~pach/.ssh/id_rsa",
                               help='rsa key to ssh connection',

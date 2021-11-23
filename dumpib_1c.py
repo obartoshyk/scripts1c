@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 from utils_1c import argparse_1c, settings_1c
-from utils_1c import sessionmanager, baselock, server, basedata, comand_1c, connection_1c
+from utils_1c import sessionmanager, baselock, server, basedata, infobase_comand, connection_1c
 
-parser = argparse_1c.ArgumentParser_1C("sBudk", description=__doc__)
+parser = argparse_1c.ArgumentParser_1C("sBudkf", description=__doc__)
 parser.add_argument('-p', '--pach',
                     metavar="PACH",
                     help='backup cat pach',
@@ -18,32 +18,30 @@ with connection_1c.Connection(srv=srv, **parser.args) as conn:
     server1c = server.Server(cmd_func=conn.cast, **parser.args)
     sm = sessionmanager.SessionManager(server1c)
 
-    for base in parser.b:
-        remote_base = basedata.IbcmdPostgresBase(
+    for base_name in parser.b:
+        ibcmd_base = basedata.IbcmdPostgresBase(
             srv=srv,
-            base=base,
+            base=base_name,
             db_usr=parser.db_usr,
             db_pwd=parser.db_pwd)
 
-        tmp_dt = fm.tmp_bkp_filename(base, "dt")
-        dest_dt = fm.dest_bkp_filename(base, "dt")
+        cl_base = server1c.get_clbase(base_name, **parser.args)
+        icomand = infobase_comand.InfobaseCommand(*ibcmd_base.getparams(),
+                                                  cmd_func=conn.cast,
+                                                  platform=parser.args["platform"])
 
-        print("***{} starting dump {}".format(settings_1c.str_cur_time(), base))
-        sm.terminate_all(base)
+        tmp_dt = fm.tmp_bkp_filename(base_name, "dt")
+        dest_dt = fm.dest_bkp_filename(base_name, "dt")
 
-        with baselock.BaseLock(server1c.get_clbase(parser.b[0], parser.usr, parser.pwd),
-                               cmd_func=conn.cast) as bl:
+        print("***{} starting dump {}".format(settings_1c.str_cur_time(), base_name))
+        sm.terminate_all(base_name)
+        with baselock.BaseLock(cl_base, cmd_func=conn.cast) as bl:
 
-            ibcmd = comand_1c.CommandMaker(*remote_base.getparams(), cmd_func=conn.cast)
-            print(ibcmd.run("infobase dump", tmp_dt))
+            print(icomand.dump(tmp_dt))
 
             conn.cast("chmod a+r " + tmp_dt)
-            ftp = conn.ssh.open_sftp()
-            ftp.get(tmp_dt, dest_dt)
-            ftp.remove(tmp_dt)
-            if ftp:
-                ftp.close()
+            conn.move_file(tmp_dt, dest_dt)
 
-        print("***{} finished dump {}".format(settings_1c.str_cur_time(), base))
+        print("***{} finished dump {}".format(settings_1c.str_cur_time(), base_name))
 
 print("***{} finished backup {}".format(settings_1c.str_cur_time(), srv))
