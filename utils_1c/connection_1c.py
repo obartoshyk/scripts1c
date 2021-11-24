@@ -62,10 +62,13 @@ class LocalConnection(object):
     def __exit__(self, type1, value, traceback):
         pass
 
-    @staticmethod
-    def move_file(tmp_dt, dest_dt):
-        shutil.copyfile(tmp_dt, dest_dt)
+    def move_file(self, tmp_dt, dest_dt):
+        self.copy_file(tmp_dt, dest_dt)
         os.remove(tmp_dt)
+
+    @staticmethod
+    def copy_file(tmp_dt, dest_dt):
+        shutil.copyfile(tmp_dt, dest_dt)
 
     @staticmethod
     def cast(cmd):

@@ -5,12 +5,12 @@ import os
 import shutil
 from utils_1c import settings_1c, argparse_1c
 
-def send_to_srv(sets,update_sets,srv_list):
+def send_to_srv(sets,update_sets,srv_list, ssh_key):
 	#scp -r $pach0/$t_name.zip  root@SRV:/root/install/$t_name.zip
 	dest = "{0}/{1}.zip".format(sets.update_cat,update_sets["upd_name"])
 	cmd_list = []
 	for srv in srv_list: 
-		cmd = "scp -i {0} -r {1} root@{2}:/var/www/html/distr1c/{3}.zip".format(sets.ssh_key,dest,srv,update_sets["upd_name"])
+		cmd = "scp -i {0} -r {1} root@{2}:/var/www/html/distr1c/new/{3}.zip".format(ssh_key,dest,srv,update_sets["upd_name"])
 		cmd_list.append(cmd)
 	if sets.test_mode:
 		for cmd in cmd_list:
@@ -52,7 +52,7 @@ def repack_deb(sets,update_sets):
 	#sudo zip -j -r $pach0/$t_name.zip $pach0/$t_name/*
 	#rm -R $pach0/$t_name
 	#sudo chmod a+r $pach0/$t_name.zip
-	sourse = "{0}/thin.client_{2}.{1}.tar.gz".format(sets.update_cat,update_sets['source_name'],sets.version_1C_)
+	sourse = "{0}/{1}{2}.tar.gz".format(sets.update_cat,update_sets['source_name'],sets.version_1C_)
 	tcat = "{0}/{1}".format(sets.update_cat,update_sets['upd_name'])
 	dest = "{0}.zip".format(tcat)
 	if sets.test_mode:
@@ -67,7 +67,7 @@ def repack_deb(sets,update_sets):
 
 if __name__ == "__main__":
 	sets = settings_1c.Settings()
-	parser =argparse_1c.ArgumentParser_1C("SK",description=__doc__) 
+	parser =argparse_1c.ArgumentParser_1C("Sk",description=__doc__)
 	parser.add_argument('-r','--repack' ,help='Repack archives mode',action='store_true', default=False)
 	parser.add_argument('-p','--update_cat' ,	metavar="~PACH",help='pach to update distr(+ add v.1C)',nargs=1,type=str, required=True)
 	parser.decode_arg()
@@ -80,4 +80,4 @@ if __name__ == "__main__":
 		if parser.args["repack"]:
 			repack[sets.update_sets[upd_name]["method"]](sets,sets.update_sets[upd_name])
 		if parser.s:
-			send_to_srv(sets,sets.update_sets[upd_name],parser.s)
+			send_to_srv(sets,sets.update_sets[upd_name],parser.s, parser.args["ssh_key"][0])

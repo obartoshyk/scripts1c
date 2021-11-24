@@ -8,6 +8,10 @@ class IbcmdFileBase(comand_1c.RunnerParams):
     def __init__(self, **kwargs):
         super(IbcmdFileBase, self).__init__()
         self.bparams = ['--db-path={}'.format(kwargs["cat_pach"])]
+        if kwargs["usr"]:
+            self.bparams.append("--user=" + kwargs["usr"])
+        if kwargs["pwd"]:
+            self.bparams.append("--password=" + kwargs["pwd"])
 
 
 class IbcmdPostgresBase(comand_1c.RunnerParams):
