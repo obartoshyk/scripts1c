@@ -39,11 +39,11 @@ def repack_osx(sets,update_sets):
 						sets.update_cat,
 						update_sets['source_name'],
 						sets.version_1C_)
-	dest = "{0}/{1}.zip".format(sets.update_cat,update_sets["upd_name"])
+	dest = "{0}/{1}.dmg".format(sets.update_cat,update_sets["upd_name"])
 	if sets.test_mode:
 		print("osx: {0} =~> {1}".format(sourse,dest))
 	else:	
-		os.system("zip -j -r {0} {1}".format(dest,sourse))
+		os.system("cp {0} {1}".format(sourse,dest))
 		os.system("chmod a+r {0}".format(dest))
 
 def repack_deb(sets,update_sets):
@@ -54,7 +54,7 @@ def repack_deb(sets,update_sets):
 	#sudo chmod a+r $pach0/$t_name.zip
 	sourse = "{0}/{1}{2}.tar.gz".format(sets.update_cat,update_sets['source_name'],sets.version_1C_)
 	tcat = "{0}/{1}".format(sets.update_cat,update_sets['upd_name'])
-	dest = "{0}.zip".format(tcat)
+	dest = "{0}.run".format(tcat)
 	if sets.test_mode:
 		print("deb: {0} =~> {1} =~> {2}".format(sourse,tcat,dest))
 	else:	
