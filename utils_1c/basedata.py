@@ -22,6 +22,8 @@ class IbcmdPostgresBase(comand_1c.RunnerParams):
         self.bparams.append("--db-name=" + kwargs["base"])
         self.bparams.append("--db-user=" + kwargs["db_usr"])
         self.bparams.append("--db-pwd=" + kwargs["db_pwd"])
+        self.bparams.append("--user=" + kwargs["usr"])
+        self.bparams.append("--password=" + kwargs["pwd"])
 
 
 class ClusterBase(object):

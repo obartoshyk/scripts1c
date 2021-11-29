@@ -46,11 +46,7 @@ for srv_name in parser.s:
                                                  cat_pach=base_name,
                                                  usr=parser.usr, pwd=parser.pwd,
                                                  db_usr=parser.db_usr, db_pwd=parser.db_pwd)
-            tmp_file = "/tmp/ibcmd_cat"
-            conn.cast('[ -d "{0}" ] && rm -r {0}'.format(tmp_file))
-            conn.cast("mkdir {0}".format(tmp_file))
-            conn.cast("chmod a+rw {0}".format(tmp_file))
+
             i_comand = infobase_comand.InfobaseCommand(*ibcmd_base.getparams(),
-                                                       "--data={0}".format(tmp_file),
                                                        cmd_func=conn.cast)
             config_run(i_comand, parser.args["method"][0], parser.args["pach"][0])

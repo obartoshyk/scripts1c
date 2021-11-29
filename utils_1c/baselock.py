@@ -16,7 +16,7 @@ class LockCommandMaker(object):
               " --sessions-deny=on" \
               " --scheduled-jobs-deny=on" \
               ' --denied-message="denied by 1cbot"'
-        return cmd.format(self.cb.cluster, self.cb.base, self.cb.usr, self.cb.pwd)
+        return cmd.format(self.cb.cluster, self.cb.infobase, self.cb.usr, self.cb.pwd)
 
     def get_unblock(self):
         cmd = "infobase --cluster={}" \
@@ -24,7 +24,7 @@ class LockCommandMaker(object):
               " --infobase-user={} " \
               "--infobase-pwd={}" \
               " --sessions-deny=off --scheduled-jobs-deny=off"
-        return cmd.format(self.cb.cluster, self.cb.base, self.cb.usr, self.cb.pwd)
+        return cmd.format(self.cb.cluster, self.cb.infobase, self.cb.usr, self.cb.pwd)
 
 
 class BaseLock(comand_1c.CommandMaker):

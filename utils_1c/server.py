@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
-import basedata
 from . import comand_1c
-
+from . import basedata
 
 class Server(comand_1c.CommandMaker):
     """Server of 1C info bases"""
@@ -35,8 +34,8 @@ class Server(comand_1c.CommandMaker):
     def get_base(self, base):
         return self.get_bases()[base]
 
-    def get_clbase(self, base, **kwargs):
-        cur_base = self.get_base(base)
+    def get_clbase(self, base_name="", **kwargs):
+        cur_base = self.get_base(base_name)
         return basedata.ClusterBase(cluster=cur_base["cluster"],
                                     infobase=cur_base["infobase"],
                                     usr=kwargs["usr"], pwd=kwargs['pwd'])

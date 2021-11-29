@@ -17,6 +17,7 @@ class ArgumentParser_1C(argparse.ArgumentParser):
         self.add_user()
         self.add_d()
         self.add_k()
+        self.add_platform()
         self.args = {}
 
     def decode_arg(self):

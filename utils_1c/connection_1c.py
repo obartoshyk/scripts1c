@@ -5,6 +5,7 @@ import paramiko
 import socket
 import shutil
 
+
 class RemoteConnection(object):
     """ Connection to 1C servers uses paramiko"""
 
@@ -21,18 +22,13 @@ class RemoteConnection(object):
 
     def __enter__(self) -> object:
         self.ssh.connect(hostname=self.srv, username='root', key_filename=self.ssh_key)
-        self.connected = True
         return self
 
     def __exit__(self, type1, value, traceback):
-        if self.connected:
-            self.ssh.close()
-            self.connected = False
+        self.ssh.close()
 
     def __del__(self):
-        if self.connected:
             self.ssh.close()
-            self.connected = False
 
     def cast(self, cmd):
         print("cast {0}: {1}".format(self.srv, cmd))
@@ -73,7 +69,7 @@ class LocalConnection(object):
     @staticmethod
     def cast(cmd):
         print("cast {0}: {1}".format("LocalHost", cmd))
-        return os.system(cmd)
+        return os.popen(cmd).read()
 
 
 class Connection(object):

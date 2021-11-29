@@ -22,10 +22,14 @@ with connection_1c.Connection(srv=srv, **parser.args) as conn:
         ibcmd_base = basedata.IbcmdPostgresBase(
             srv=srv,
             base=base_name,
+            usr=parser.usr, pwd=parser.pwd,
             db_usr=parser.db_usr,
             db_pwd=parser.db_pwd)
 
-        cl_base = server1c.get_clbase(base_name, **parser.args)
+        cl_base = server1c.get_clbase(base_name=base_name, usr=parser.usr, pwd=parser.pwd, **parser.args)
+
+
+
         icomand = infobase_comand.InfobaseCommand(*ibcmd_base.getparams(),
                                                   cmd_func=conn.cast,
                                                   platform=parser.args["platform"])

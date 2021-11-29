@@ -7,7 +7,11 @@ from . import comand_1c
 class InfobaseCommand(comand_1c.CommandMaker):
 
     def __init__(self, *args, **kwargs):
-        comand_1c.CommandMaker.__init__(self, *args, command="ibcmd", **kwargs)
+        tmp_file = "/tmp/ibcmd_cat"
+        kwargs["cmd_func"]('[ -d "{0}" ] && rm -r {0}'.format(tmp_file))
+        kwargs["cmd_func"]("mkdir {0}".format(tmp_file))
+        kwargs["cmd_func"]("chmod a+rw {0}".format(tmp_file))
+        comand_1c.CommandMaker.__init__(self, *args,  "--data={0}".format(tmp_file), command="ibcmd", **kwargs)
 
     def config_save(self, tmpfile=""):
         return self.run("infobase config save", tmpfile)
