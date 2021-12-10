@@ -39,9 +39,9 @@ parser.add_argument('-p', '--pach',
                     nargs=1, type=str, required=False)
 parser.decode_arg()
 
-for srv_name in parser.s:
+for srv_name in parser.args["server"]:
     with connection_1c.Connection(srv=srv_name, **parser.args) as conn:
-        for base_name in parser.b:
+        for base_name in parser.args["base"]:
             ibcmd_base = basedata.get_ibcmd_base(base=base_name, type="file", srv=srv_name,
                                                  cat_pach=base_name,
                                                  usr=parser.usr, pwd=parser.pwd,

@@ -79,5 +79,5 @@ if __name__ == "__main__":
 	for upd_name in sets.update_sets:
 		if parser.args["repack"]:
 			repack[sets.update_sets[upd_name]["method"]](sets,sets.update_sets[upd_name])
-		if parser.s:
-			send_to_srv(sets,sets.update_sets[upd_name],parser.s, parser.args["ssh_key"][0])
+		if parser.args["server"]:
+			send_to_srv(sets, sets.update_sets[upd_name], parser.args["server"], parser.args["ssh_key"][0])

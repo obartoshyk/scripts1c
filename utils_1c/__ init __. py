@@ -2,6 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 __all__ = ['argparse_1c',
+           'ocv8',
            'basedata',
            'baselock',
            'comand_1c',

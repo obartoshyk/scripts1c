@@ -15,7 +15,7 @@ parser.add_argument('-p','--params' ,
 parser.decode_arg()
 sets = settings_1c.Settings()
 
-with connection_1c.Connection(srv=parser.s[0],**parser.args) as conn:
+with connection_1c.Connection(srv=parser.args["server"][0], **parser.args) as conn:
 
 	server1c = server.Server(cmd_func=conn.cast, **parser.args)
 	server1c.init_bases()
@@ -30,7 +30,7 @@ with connection_1c.Connection(srv=parser.s[0],**parser.args) as conn:
 							rac_pach=sets.rac_pach["deb"],
 							**server1c.get_base(base)))
 		else:	
-			for cluster in conn.clusters_list:
+			for cluster in server1c.clusters_list:
 				st.append(n.format(param=param,
 						rac_pach=sets.rac_pach["deb"],
 						cluster=cluster))

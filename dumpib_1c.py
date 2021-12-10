@@ -12,13 +12,13 @@ parser.decode_arg()
 
 fm = settings_1c.FileManager()
 fm.init_bkp_pach(parser.args["pach"][0])
-srv = parser.s[0]
+srv = parser.args["server"][0]
 print("***{} starting backup {}".format(settings_1c.str_cur_time(), srv))
 with connection_1c.Connection(srv=srv, **parser.args) as conn:
     server1c = server.Server(cmd_func=conn.cast, **parser.args)
     sm = sessionmanager.SessionManager(server1c)
 
-    for base_name in parser.b:
+    for base_name in parser.args["base"]:
         ibcmd_base = basedata.IbcmdPostgresBase(
             srv=srv,
             base=base_name,
@@ -27,8 +27,6 @@ with connection_1c.Connection(srv=srv, **parser.args) as conn:
             db_pwd=parser.db_pwd)
 
         cl_base = server1c.get_clbase(base_name=base_name, usr=parser.usr, pwd=parser.pwd, **parser.args)
-
-
 
         icomand = infobase_comand.InfobaseCommand(*ibcmd_base.getparams(),
                                                   cmd_func=conn.cast,

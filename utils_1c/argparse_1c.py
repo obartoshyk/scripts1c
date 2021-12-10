@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 import argparse
+import yaml
 
 
 class ArgumentParser_1C(argparse.ArgumentParser):
@@ -9,74 +10,65 @@ class ArgumentParser_1C(argparse.ArgumentParser):
     def __init__(self, modeline="", **kwargs):
         super(ArgumentParser_1C, self).__init__(**kwargs)
         self.add_argument('-t', '--test', help='Test mode', action='store_true', default=False)
-        self.add_argument('-y', '--yaml_file', help='yaml file pach', required=False)
+        self.add_argument('-y', '--yaml_file', help='.yml file pach', required=False)
         self.modeline = modeline
-        self.add_b()
-        self.add_s()
-        self.add_c()
+        self.args = {"test": False}
+        self.add_base()
+        self.add_server()
+        self.add_client()
         self.add_user()
         self.add_d()
         self.add_k()
         self.add_platform()
-        self.args = {}
 
     def decode_arg(self):
         args = vars(self.parse_args())
+        yaml_file = args.get("yaml_file")
+        if yaml_file:
+            self.decode_yaml(yaml_file)
         for k, v in args.items():
-            self.args[k] = v
-        cfg_file = self.args.get("yaml_file")
-        if cfg_file:
-            self.decode_cfg(cfg_file)
-        self.decode_args(args)
-        return args
+            if v:
+                self.args[k] = v
 
-    def decode_args(self, args):
-        self.decode_b(args)
-        self.decode_s(args)
-        self.decode_c(args)
-        self.decode_u(args)
-        self.decode_d(args)
+        self.decode_special_args()
+        return self.args
+
+    def decode_special_args(self):
+        for k, v in self.args.items():
+            if k == "user":
+                self.usr, self.pwd = self.args['user'][0].split(":")
+            if k == "db_user":
+                self.db_usr, self.db_pwd = self.args['db_user'][0].split(":")
+            if k == "platform" or k == "ssh_key" or k == "type":
+                if self.args[k]:
+                    self.args[k] = self.args[k][0]
 
     def add_platform(self):
         if self.modeline.find("f") != -1:
+            self.args["platform"] = "deb"
             self.add_argument('-f', '--platform',
                               metavar="DEB",
                               help='deb/win',
                               nargs=1, type=str, default="deb", required=False)
 
-    def add_b(self):
-        if self.modeline.find("b") != -1:
-            self.add_argument('-b', '--base',
-                              metavar="BASE",
-                              help='1C Base',
-                              nargs=1, type=str, required=False)
-        if self.modeline.find("B") != -1:
+    def add_base(self):
+        if self.modeline.find("b") != -1 or self.modeline.find("B") != -1:
             self.add_argument('-b', '--base',
                               metavar="BASES",
                               help='1C Bases list',
                               nargs="*", type=str,
                               required=False)
 
-    def add_s(self):
-        if self.modeline.find("s") != -1:
-            self.add_argument('-s', '--server',
-                              metavar="SRV",
-                              help='1C Server',
-                              nargs=1, type=str, required=False)
-        if self.modeline.find("S") != -1:
+    def add_server(self):
+        if self.modeline.find("s") != -1 or self.modeline.find("S") != -1:
             self.add_argument('-s', '--server',
                               metavar="SRVS",
                               help='1C Server list',
                               nargs="*", type=str,
                               required=False)
 
-    def add_c(self):
-        if self.modeline.find("c") != -1:
-            self.add_argument('-c', '--client',
-                              metavar="CLIENT",
-                              help='1C Client',
-                              nargs=1, type=str, required=False)
-        if self.modeline.find("C") != -1:
+    def add_client(self):
+        if self.modeline.find("c") != -1 or self.modeline.find("C") != -1:
             self.add_argument('-c', '--client',
                               metavar="CLIENTS",
                               help='1C Clients list(empty=ALL)',
@@ -104,36 +96,23 @@ class ArgumentParser_1C(argparse.ArgumentParser):
                               help='rsa key to ssh connection',
                               nargs=1, type=str, required=False)
 
-    def decode_b(self, args):
-        if self.modeline.find("b") != -1:
-            self.b = args["base"]
-        if self.modeline.find("B") != -1:
-            self.b = args["base"]
+    def decode_yaml(self, cfg_file):
+        with open(cfg_file, 'r') as stream:
+            for k, i in yaml.safe_load(stream).items():
+                self.args[k] = i
 
-    def decode_c(self, args):
-        if self.modeline.find("c") != -1:
-            self.c = args["client"]
-        if self.modeline.find("C") != -1:
-            self.c = args["client"]
-
-    def decode_s(self, args):
-        if self.modeline.find("s") != -1:
-            self.s = args["server"]
-        if self.modeline.find("S") != -1:
-            self.s = args["server"]
-
-    def decode_u(self, args):
-        if self.modeline.find("u") != -1:
-            self.usr, self.pwd = args['user'][0].split(":")
-
-    def decode_d(self, args):
-        if self.modeline.find("d") != -1:
-            self.db_usr, self.db_pwd = args['db_user'][0].split(":")
-
-    def decode_cfg(self, cfg_file):
-        with open(cfg_file, 'r') as cfile:
-            for line in cfile.read().splitlines():
-              print(line)
+    def get_single_base_params(self):
+        pl = ["srv", "server", "base",
+              "usr", "pwd", "db_usr", "db_pwd",
+              "type", "cat_pach"]
+        sb_params = {atr: getattr(self, atr) for atr in pl if hasattr(self, atr)}
+        for k, v in self.args.items():
+            if k in pl:
+                sb_params[k] = v
+        for k, v in sb_params.items():
+            if isinstance(v, list):
+                sb_params[k] = v[0]
+        return sb_params
 
 
 if __name__ == "__main__":

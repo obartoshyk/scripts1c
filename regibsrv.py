@@ -105,8 +105,8 @@ if __name__ == "__main__":
     mode = parser.args["mode"][0]
     oIbSrv = IbSrv(**params)
 
-    if parser.s[0] == "localhost":
+    if parser.args["server"][0] == "localhost":
         oIbSrv.local(mode)
     else:
-        with connection_1c.Connection(srv=parser.s[0], **parser.args) as conn:
+        with connection_1c.Connection(srv=parser.args["server"][0], **parser.args) as conn:
             oIbSrv.remote(mode, conn)

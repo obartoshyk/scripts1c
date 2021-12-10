@@ -75,6 +75,7 @@ class Settings(object):
         self.r1cv8_pach = {"deb": self.fdeb(self.deb_r1cv8_pach)}
         self.ibcmd_pach = {"deb": self.fdeb(self.deb_ibcmd_pach)}
         self.ibsrv_pach = {"deb": self.fdeb(self.deb_ibsrv_pach)}
+        self.designer_pach = {"deb": self.fdeb(self.deb_designer_pach)}
 
     def srvdict(self, bases):
         srvdict = {}

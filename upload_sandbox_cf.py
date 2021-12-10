@@ -21,7 +21,7 @@ parser.add_argument('-n', '--sandbox',
 parser.decode_arg()
 
 local_base = basedata.IbcmdFileBase(parser.args["pach"][0])
-sandbox_base = basedata.IbcmdFileBase("{}/{}".format(parser.args["sandbox"][0], parser.b[0]))
+sandbox_base = basedata.IbcmdFileBase("{}/{}".format(parser.args["sandbox"][0], parser.args["base"][0]))
 
 if parser.args["test"]:
     def lcmd_func(x):
@@ -34,13 +34,13 @@ local_Config = config.Config(*local_base.getparams(),
 tmpfile = local_Config.config_save()
 
 
-with connection_1c.Connection(srv=parser.s[0], **parser.args) as conn:
+with connection_1c.Connection(srv=parser.args["server"][0], **parser.args) as conn:
     if parser.args["test"]:
         def cmd_func(x):
             print(x)
     else:
         ftp = conn.ssh.open_sftp()
-        print("uploading to {}".format(parser.s[0]))
+        print("uploading to {}".format(parser.args["server"][0]))
         ftp.put(tmpfile, tmpfile)
         os.remove(tmpfile)
 

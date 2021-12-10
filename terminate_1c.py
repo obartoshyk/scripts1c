@@ -19,9 +19,9 @@ if not(parser.args["base"]) and not(parser.args["client"]):
 	raise "I can`t ruin everything again!"
 
 
-for srv in parser.s:
+for srv in parser.args["server"]:
 	with connection_1c.Connection(srv=srv, **parser.args) as conn:
 		server1c = server.Server(cmd_func=conn.cast, platform=parser.args["platform"])
 		sm = sessionmanager.SessionManager(server1c)
-		for base_name in parser.b if parser.b else server1c.get_bases():
-			terminate(sm, base_name, parser.c)
+		for base_name in parser.args["base"] if parser.args["base"] else server1c.get_bases():
+			terminate(sm, base_name, parser.args["client"])
