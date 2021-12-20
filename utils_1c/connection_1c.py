@@ -36,7 +36,7 @@ class RemoteConnection(object):
         data = stdout.read().decode()
         err = stderr.read().decode()
         if err:
-            raise "cast ERROR: {}".format(err)
+            print("cast ERROR: {}".format(err))
         else:
             return data
 

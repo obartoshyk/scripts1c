@@ -16,9 +16,19 @@ class Runner(RunnerParams):
         RunnerParams.__init__(self, *args)
         self.cmd_func = cmd_func
         self.cmd_pach = cmd_pach
+        try:
+            self.env = kwargs["env"]
+        except:
+            self.env = ""
 
     def run(self, cmd0, *args):
-        cmd = self.create_cmd(self.cmd_pach, cmd0, *self.getparams(), *args)
+        farg = []
+        if self.env:
+            farg.append(self.env)
+        farg.append(self.cmd_pach)
+        if cmd0:
+            farg.append(cmd0)
+        cmd = self.create_cmd(*farg, *self.getparams(), *args)
         return self.cmd_func(cmd)
 
     @staticmethod
@@ -31,3 +41,4 @@ class CommandMaker(Runner):
         sets = settings_1c.Settings()
         cmd_pach = getattr(sets, "{}_pach".format(command))[platform]
         Runner.__init__(self, *args, **kwargs, cmd_pach=cmd_pach)
+

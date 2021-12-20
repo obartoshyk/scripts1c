@@ -37,9 +37,13 @@ class ArgumentParser_1C(argparse.ArgumentParser):
         for k, v in self.args.items():
             if k == "user":
                 self.usr, self.pwd = self.args['user'][0].split(":")
+                if self.pwd == "NONE":
+                    self.pwd = ""
             if k == "db_user":
                 self.db_usr, self.db_pwd = self.args['db_user'][0].split(":")
-            if k == "platform" or k == "ssh_key" or k == "type":
+                if self.db_pwd == "NONE":
+                    self.db_pwd = ""
+            if k == "ssh_key" or k == "type":
                 if self.args[k]:
                     self.args[k] = self.args[k][0]
 

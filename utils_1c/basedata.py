@@ -7,7 +7,7 @@ from . import comand_1c
 class IbcmdFileBase(comand_1c.RunnerParams):
     def __init__(self, **kwargs):
         super(IbcmdFileBase, self).__init__()
-        self.bparams = ['--db-path={}'.format(kwargs["cat_pach"])]
+        self.bparams = ['--db-path={}'.format(kwargs["base"])]
         if kwargs["usr"]:
             self.bparams.append("--user=" + kwargs["usr"])
         if kwargs["pwd"]:
@@ -48,17 +48,19 @@ class DesignerPostgresBase(comand_1c.RunnerParams):
     def get_process_template(self):
         return self.bparams[0]
 
+
 class DesignerFileBase(comand_1c.RunnerParams):
     def __init__(self, **kwargs):
         super(DesignerFileBase, self).__init__()
         self.bparams = []
-        self.bparams = ['/F "{0}"'.format(kwargs["cat_pach"])]
+        self.bparams = ['/F "{0}"'.format(kwargs["base"])]
         self.bparams.append('/N "{0}"'.format(kwargs["usr"]))
         if kwargs["pwd"]:
             self.bparams.append('/P "{0}"'.format(kwargs["pwd"]))
 
     def get_process_template(self):
         return self.bparams[0]
+
 
 def get_ibcmd_base(**kwargs):
     if kwargs["type"] == "postgres":
