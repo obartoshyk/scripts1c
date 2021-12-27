@@ -31,10 +31,6 @@ with connection_1c.Connection(srv=srv, **parser.args) as conn:
 
         cl_base = server1c.get_clbase(base_name=base_name, usr=parser.usr, pwd=parser.pwd, **parser.args)
 
-        #icomand = infobase_comand.InfobaseCommand(*ibcmd_base.getparams(),
-        #                                          cmd_func=conn.cast,
-        #                                          platform=parser.args["platform"])
-
         ds_base = basedata.get_designer_base(**parser.get_single_base_params())
 
         tmp_dt = fm.tmp_bkp_filename(base_name, "dt")
@@ -42,10 +38,10 @@ with connection_1c.Connection(srv=srv, **parser.args) as conn:
         if srv == "localhost" or srv == socket.gethostname():
             tmp_dt = dest_dt
         print("***{} starting dump {}".format(settings_1c.str_cur_time(), base_name))
-        sm.terminate_all(base_name)
 
         with baselock.BaseLock(cl_base, uc="bkp_bot_key", cmd_func=conn.cast) as bl:
 
+            sm.terminate_all(base_name)
             cv = ocv8.DesignerCommand(*ds_base.getparams(), "/UC {}".format("bkp_bot_key"), env="DISPLAY=:1", cmd_func=conn.cast)
             print(cv.DumpIB(tmp_dt))
 

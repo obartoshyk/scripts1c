@@ -23,5 +23,8 @@ for srv in parser.args["server"]:
 	with connection_1c.Connection(srv=srv, **parser.args) as conn:
 		server1c = server.Server(cmd_func=conn.cast, platform=parser.args["platform"])
 		sm = sessionmanager.SessionManager(server1c)
+		server1c.init_clusters()
+		server1c.init_bases()
 		for base_name in parser.args["base"] if parser.args["base"] else server1c.get_bases():
-			terminate(sm, base_name, parser.args["client"])
+			sm.terminate_all(base_name)
+			#terminate(sm, base_name, parser.args["client"])
