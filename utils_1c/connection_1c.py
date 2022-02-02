@@ -42,10 +42,15 @@ class RemoteConnection(object):
 
     def move_file(self, tmp_dt, dest_dt):
         ftp = self.ssh.open_sftp()
-        ftp.get(tmp_dt, dest_dt)
-        ftp.remove(tmp_dt)
-        if ftp:
-            ftp.close()
+        try:
+            ftp.stat(tmp_dt)
+            ftp.get(tmp_dt, dest_dt)
+            ftp.remove(tmp_dt)
+        except IOError:
+            print('file {} not exist'.format(tmp_dt))
+        finally:
+            if ftp:
+                ftp.close()
 
 
 class LocalConnection(object):

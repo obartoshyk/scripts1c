@@ -10,5 +10,6 @@ __all__ = ['argparse_1c',
            'connection_1c',
            'server',
            'sessionmanager',
-           'settings_1c'
+           'settings_1c',
+           'tw'
            ]

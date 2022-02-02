@@ -40,26 +40,28 @@ class DesignerPostgresBase(comand_1c.RunnerParams):
         super(DesignerPostgresBase, self).__init__()
         server = kwargs["srv"] if hasattr(kwargs, "srv") else kwargs["server"]
         self.bparams = []
-        self.bparams.append('/S "{0}\{1}"'.format(server, kwargs["base"]))
+        self.bparams.append('/S')
+        self.bparams.append('"{0}\{1}"'.format(server, kwargs["base"]))
         self.bparams.append('/N "{0}"'.format(kwargs["usr"]))
         if kwargs["pwd"]:
             self.bparams.append('/P "{0}"'.format(kwargs["pwd"]))
 
     def get_process_template(self):
-        return self.bparams[0]
+        return self.bparams[1]
 
 
 class DesignerFileBase(comand_1c.RunnerParams):
     def __init__(self, **kwargs):
         super(DesignerFileBase, self).__init__()
         self.bparams = []
-        self.bparams = ['/F "{0}"'.format(kwargs["base"])]
+        self.bparams.append('/F')
+        self.bparams.append('"{0}"'.format(kwargs["base"]))
         self.bparams.append('/N "{0}"'.format(kwargs["usr"]))
         if kwargs["pwd"]:
             self.bparams.append('/P "{0}"'.format(kwargs["pwd"]))
 
     def get_process_template(self):
-        return self.bparams[0]
+        return self.bparams[1]
 
 
 def get_ibcmd_base(**kwargs):
