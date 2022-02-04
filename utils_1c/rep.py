@@ -3,35 +3,39 @@
 class Repository(object):
     """Server of 1C info bases"""
 
-    def __init__(self, pach):
+    def __init__(self, pach0):
         super(Repository, self).__init__()
-        self.pach = pach
+        self.pach = "{}/conf".format(pach0)
+        self.gitdir = "{}/.git".format(pach0)
+
+    def fcmd_list(self, cmd_list):
+        return [x % {"pach": self.pach} for x in cmd_list]
 
     def get_pull_cmd(self, branch):
         cmd_list = ["cd {}".format(self.pach),
-                    "git pull {}".format(branch)]
-        return cmd_list
+                    "git -C %(pach)s pull {0}".format(branch)]
+        return self.fcmd_list(cmd_list)
 
     def get_commit_cmd(self, text):
         cmd_list = ["cd {}".format(self.pach),
-                    "git add .",
-                    'git commit -m "{}"'.format(text)]
-        return cmd_list
+                    "git -C %(pach)s add .",
+                    'git -C %(pach)s commit -m "{0}"'.format(text)]
+        return self.fcmd_list(cmd_list)
 
     def get_push_cmd(self):
-        cmd_list = ["cd {}".format(self.pach),
-                    "git push"]
-        return cmd_list
+        cmd_list = ["cd %(pach)s",
+                    "git -C %(pach)s push"]
+        return self.fcmd_list(cmd_list)
 
     def get_start_reload_cmd(self):
         cmd_list = ['[ -d "/tmp/tmpxml" ] && rm -r /tmp/tmpxml',
-                    'rm {}/ConfigDumpInfo.xml'.format(self.pach),
+                    'rm %(pach)s/ConfigDumpInfo.xml',
                     'mkdir /tmp/tmpxml']
-        for cmd in self.get_pull_cmd():
+        for cmd in self.get_pull_cmd("origin master"):
             cmd_list.append(cmd)
-        return cmd_list
+        return self.fcmd_list(cmd_list)
 
     def get_end_reload_cmd(self):
-        cmd_list = ['cp /tmp/tmpxml/{1} {0}/{1}'.format(self.pach, "ConfigDumpInfo.xml"),
+        cmd_list = ['cp /tmp/tmpxml/ConfigDumpInfo.xml %(pach)s/ConfigDumpInfo.xml',
                     'rm -r /tmp/tmpxml']
-        return cmd_list
+        return self.fcmd_list(cmd_list)

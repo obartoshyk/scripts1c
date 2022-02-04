@@ -9,6 +9,10 @@ def cast_cmd_list(cn, cmd_list):
 
 
 parser = argparse_1c.ArgumentParser_1C("sBudkf", description=__doc__)
+parser.add_argument('-e', '--text',
+                    metavar="TXT",
+                    help='AUT-2000',
+                    nargs=1, type=str, default="save", required=True)
 parser.decode_arg()
 
 srv = parser.args["server"][0]
@@ -23,8 +27,6 @@ with connection_1c.Connection(srv=srv, **parser.args) as conn:
     i_comand = infobase_comand.InfobaseCommand(*ibcmd_base.getparams(),
                                                cmd_func=conn.cast)
     repo = rep.Repository(parser.args["repozitory"][0])
-    cast_cmd_list(conn, repo.get_start_reload_cmd())
-    print(i_comand.config_import(repo.pach))
-    print(i_comand.config_export('/tmp/tmpxml'))
-    cast_cmd_list(conn, repo.get_end_reload_cmd())
     print(i_comand.config_export_sync(repo.pach))
+    cast_cmd_list(conn, repo.get_commit_cmd())
+    cast_cmd_list(conn, repo.get_push_cmd())
