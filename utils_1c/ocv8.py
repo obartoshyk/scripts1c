@@ -37,8 +37,9 @@ class DesignerCommand(comand_1c.CommandMaker):
     def LoadConfigFromFiles(self, tmpfile):
         return self.run("", "/LoadConfigFromFiles", tmpfile)
 
-    def LoadConfigFromFilesUPD(self, tmpfile):
-        return self.run("", "/LoadConfigFromFiles", tmpfile, "/UpdateDBCfg", "-Dynamic+")
+    def LoadConfigFromFilesUPD(self, tmpfile, dynamic, outfile):
+        dyn = "-Dynamic+" if dynamic else "-Dynamic-"
+        return self.run("", "/LoadConfigFromFiles", tmpfile, "/UpdateDBCfg", dyn, "/Out", outfile)
 
     def RollbackCfg(self):
         return self.run("", "/RollbackCfg")

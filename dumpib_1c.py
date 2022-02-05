@@ -25,15 +25,7 @@ with connection_1c.Connection(srv=srv, **parser.args) as conn:
     server1c.init_clusters()
     server1c.init_bases()
     for base_name in parser.args["base"]:
-        ibcmd_base = basedata.IbcmdPostgresBase(
-            srv=srv,
-            base=base_name,
-            usr=parser.usr, pwd=parser.pwd,
-            db_usr=parser.db_usr,
-            db_pwd=parser.db_pwd)
-
         cl_base = server1c.get_clbase(base_name=base_name, usr=parser.usr, pwd=parser.pwd, **parser.args)
-
         ds_base = basedata.get_designer_base(**parser.get_single_base_params())
 
         tmp_dt = fm.tmp_bkp_filename(base_name, "dt")
@@ -50,18 +42,7 @@ with connection_1c.Connection(srv=srv, **parser.args) as conn:
             sleep(5)
             cv = ocv8.DesignerCommand(*ds_base.getparams(), "/UC {}".format("bkp_bot_key"), env="DISPLAY=:1", cmd_func=conn.cast)
             w = tw.ThreadWorker(cv.DumpIB)
-            w.start((tmp_dt, ))
-
-            countdown = 1000
-            done = False
-            while countdown > 0 and not done:
-                sleep(5)
-                countdown = countdown - 5
-                if not w.is_alive():
-                    done = True
-                    break
-
-            if done:
+            if w.make_work((tmp_dt, ), 1000):
                 print(w.get_data())
                 conn.cast("chmod a+r " + tmp_dt)
                 if tmp_dt != dest_dt:

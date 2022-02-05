@@ -28,5 +28,5 @@ with connection_1c.Connection(srv=srv, **parser.args) as conn:
                                                cmd_func=conn.cast)
     repo = rep.Repository(parser.args["repozitory"][0])
     print(i_comand.config_export_sync(repo.pach))
-    cast_cmd_list(conn, repo.get_commit_cmd())
-    cast_cmd_list(conn, repo.get_push_cmd())
+    cast_cmd_list(conn, repo.get_commit_cmd(parser.args["text"][0]))
+    #cast_cmd_list(conn, repo.get_push_cmd())

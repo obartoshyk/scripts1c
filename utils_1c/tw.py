@@ -3,12 +3,11 @@
 import threading
 from time import sleep
 
+
 class ThreadWorker(object):
-    '''
-    The basic idea is given a function create an object.
+    """The basic idea is given a function create an object.
     The object can then run the function in a thread.
-    It provides a wrapper to start it,check its status,and get data out the function.
-    '''
+    It provides a wrapper to start it,check its status,and get data out the function."""
     def __init__(self, target):
         self.thread = None
         self.data = None
@@ -33,3 +32,15 @@ class ThreadWorker(object):
 
     def get_data(self):
         return self.data
+
+    def make_work(self, args, countdown):
+        done = False
+        self.start(args)
+        timer = countdown
+        while timer > 0 and not done:
+            sleep(5)
+            timer = timer - 5
+            if not self.is_alive():
+                done = True
+                break
+        return done
