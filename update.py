@@ -19,6 +19,10 @@ srv = parser.args["server"][0]
 base = parser.args["base"][0]
 
 with connection_1c.Connection(srv=srv, **parser.args) as conn:
+    answ = conn.cast("ps x | grep 1cv8 | grep {}".format(base)).split("\n")
+    for k in range(0, len(answ) - 1):
+        raise Exception("Base is locked by process: {}".format(k))
+
     ds_base = basedata.get_designer_base(**parser.get_single_base_params())
     repo = rep.Repository(parser.args["repozitory"][0])
 
