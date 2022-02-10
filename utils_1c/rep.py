@@ -19,12 +19,12 @@ class Repository(object):
     def get_commit_cmd(self, text):
         cmd_list = ["cd {}".format(self.pach),
                     'git -C "%(pach)s" add .',
-                    'git "-C %(pach)s" commit -m "{0}"'.format(text)]
+                    'git -C "%(pach)s" commit -m "{0}"'.format(text)]
         return self.fcmd_list(cmd_list)
 
     def get_push_cmd(self):
         cmd_list = ["cd %(pach)s",
-                    'git "-C %(pach)s" push']
+                    'git -C "%(pach)s" push']
         return self.fcmd_list(cmd_list)
 
     def get_start_reload_cmd(self):
