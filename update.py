@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 from utils_1c import basedata, connection_1c, argparse_1c, ocv8, rep, tw, server, sessionmanager, baselock
+from time import sleep
 
 
 def cast_cmd_list(cn, cmd_list):
@@ -20,8 +21,8 @@ base = parser.args["base"][0]
 
 with connection_1c.Connection(srv=srv, **parser.args) as conn:
     answ = conn.cast("ps x | grep 1cv8 | grep {}".format(base)).split("\n")
-    for k in range(0, len(answ) - 1):
-        raise Exception("Base is locked by process: {}".format(k))
+    for k in range(1, len(answ) - 1):
+        raise Exception("Base is locked by process: {}".format(answ[k]))
 
     ds_base = basedata.get_designer_base(**parser.get_single_base_params())
     repo = rep.Repository(parser.args["repozitory"][0])
@@ -32,18 +33,23 @@ with connection_1c.Connection(srv=srv, **parser.args) as conn:
     outlog = "/tmp/outlog_{}.log".format(base)
     conn.cast('[ -d "{0}" ] && rm -r {0}'.format(outlog))
     w = tw.ThreadWorker(cv.LoadConfigFromFilesUPD)
-    if parser.args["dynamic"]:
-        done = w.make_work((repo.pach, True, outlog), 1000)
+    try:
+        dynamic = parser.args["dynamic"]
+    except:
+        dynamic = False
+    if dynamic:
+        done = w.make_work((repo.pach, True, outlog), 300000)
     else:
         server1c = server.Server(cmd_func=conn.cast, **parser.args)
         sm = sessionmanager.SessionManager(server1c)
         cl_base = server1c.get_clbase(base_name=base, usr=parser.usr, pwd=parser.pwd, **parser.args)
         with baselock.BaseLock(cl_base, uc="bkp_bot_key", cmd_func=conn.cast) as bl:
             sm.terminate_all(base)
-            done = w.make_work((repo.pach, False, outlog), 1000)
+            done = w.make_work((repo.pach, False, outlog), 300000)
     if done:
         print(conn.cast('cat {}'.format(outlog)))
     else:
+        sleep(20)
         answ = conn.cast("ps x | grep 1cv8 | grep {} | cut -d ' ' -f 1".format(base)).split("\n")
         for k in range(0, len(answ) - 1):
             conn.cast('kill {0}'.format(answ[k]))
