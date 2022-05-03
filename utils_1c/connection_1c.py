@@ -4,6 +4,7 @@ import os
 import paramiko
 import socket
 import shutil
+import types
 
 
 class RemoteConnection(object):
@@ -84,9 +85,36 @@ class Connection(object):
             self.connection = LocalConnection()
         else:
             self.connection = RemoteConnection(srv=srv, **kwargs)
+        self.connection.ps_grep = types.MethodType(self.ps_grep, self.connection)
+        self.connection.kill = types.MethodType(self.kill, self.connection)
 
     def __enter__(self):
         return self.connection.__enter__()
 
     def __exit__(self, type1, value, traceback):
         self.connection.__exit__(type1, value, traceback)
+
+    @staticmethod
+    def ps_grep(conn, grep_list):
+        proc_list = []
+        if not grep_list:
+            return proc_list
+        cmd = "ps x"
+        for grep_cmd in grep_list:
+            cmd = "{} | grep {}".format(cmd, grep_cmd)
+        for str in conn.cast(cmd).split("\n"):
+            for wrd in str.split(" "):
+                if wrd:
+                    proc_list.append(wrd)
+                    break
+        if proc_list:
+            proc_list.pop()
+        return proc_list
+
+    @staticmethod
+    def kill(conn, pid):
+        if pid:
+            cmd = "kill {}".format(pid)
+            return conn.cast(cmd)
+
+

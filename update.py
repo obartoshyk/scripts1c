@@ -20,9 +20,8 @@ srv = parser.args["server"][0]
 base = parser.args["base"][0]
 
 with connection_1c.Connection(srv=srv, **parser.args) as conn:
-    answ = conn.cast("ps x | grep 1cv8 | grep {}".format(base)).split("\n")
-    for k in range(1, len(answ) - 1):
-        raise Exception("Base is locked by process: {}".format(answ[k]))
+    for pid in conn.ps_grep(["1cv8", base]):
+        raise Exception("Base is locked by process: {}".format(pid))
 
     ds_base = basedata.get_designer_base(**parser.get_single_base_params())
     repo = rep.Repository(parser.args["repozitory"][0])
@@ -41,9 +40,9 @@ with connection_1c.Connection(srv=srv, **parser.args) as conn:
         done = w.make_work((repo.pach, True, outlog), 300000)
     else:
         server1c = server.Server(cmd_func=conn.cast, **parser.args)
-        sm = sessionmanager.SessionManager(server1c)
         cl_base = server1c.get_clbase(base_name=base, usr=parser.usr, pwd=parser.pwd, **parser.args)
         with baselock.BaseLock(cl_base, uc="bkp_bot_key", cmd_func=conn.cast) as bl:
+            sm = sessionmanager.SessionManager(server1c)
             sm.terminate_all(base)
             done = w.make_work((repo.pach, False, outlog), 300000)
     if done:

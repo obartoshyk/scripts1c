@@ -23,9 +23,8 @@ class SessionManager(object):
         for curr_sess in self.current_sessions(base):
             self.terminate_session(cluster, curr_sess["session"])
 
-    def terminate_sessions(self, base, userlist):
+    def terminate_sessions(self, base, user_list):
         cluster = self.server.get_base(base)["cluster"]
         for curr_sess in self.current_sessions(base):
-            if curr_sess["user-name"] in userlist:
+            if curr_sess["user-name"] in user_list:
                 self.terminate_session(cluster, curr_sess["session"])
-

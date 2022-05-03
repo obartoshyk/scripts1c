@@ -49,9 +49,8 @@ with connection_1c.Connection(srv=srv, **parser.args) as conn:
                     conn.move_file(tmp_dt, dest_dt)
                 print("***{} finished dump {}".format(settings_1c.str_cur_time(), base_name))
             else:
-                answ = conn.cast("ps x | grep 1cv8 | grep {} | cut -d ' ' -f 1".format(base_name)).split("\n")
-                for k in range(0, len(answ) - 1):
-                    conn.cast('kill {0}'.format(answ[k]))
+                list(map(conn.kill, conn.ps_grep(["1cv8", base_name])))
+                sleep(15)
                 print("***{} ERROR dump {}".format(settings_1c.str_cur_time(), base_name))
 
 
