@@ -8,7 +8,7 @@ class ThreadWorker(object):
     """The basic idea is given a function create an object.
     The object can then run the function in a thread.
     It provides a wrapper to start it,check its status,and get data out the function."""
-    def __init__(self, target):
+    def __init__(self, target) -> object:
         self.thread = None
         self.data = None
         self.target = self.save_data(target)

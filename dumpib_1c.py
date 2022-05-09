@@ -1,57 +1,98 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 from utils_1c import argparse_1c, settings_1c
-from utils_1c import sessionmanager, baselock, server, basedata,  connection_1c
-from utils_1c import ocv8
+from utils_1c import sessionmanager, baselock, server, basedata, connection_1c
+from utils_1c import ocv8, xvfb
 from utils_1c import tw
 from time import sleep
 
-import socket
 
-parser = argparse_1c.ArgumentParser_1C("sBudkf", description=__doc__)
-parser.add_argument('-p', '--pach',
-                    metavar="PACH",
-                    help='backup cat pach',
-                    nargs="*", type=str, required=False)
-parser.decode_arg()
+class DumpMaker(object):
+    def __init__(self):
+        super(DumpMaker, self).__init__()
+        self.conn = None
+        self.sm = None
+        self.base_name = None
+        self.server1c = None
+        self.cl_base = None
+        self.xvfb = None
+        self.parser = None
+        self.fm = None
+        self.srv = None
+        self.ds_base = None
 
-fm = settings_1c.FileManager()
-fm.init_bkp_pach(parser.args["pach"][0])
-srv = parser.args["server"][0]
-print("***{} starting backup {}".format(settings_1c.str_cur_time(), srv))
-with connection_1c.Connection(srv=srv, **parser.args) as conn:
-    server1c = server.Server(cmd_func=conn.cast, **parser.args)
-    sm = sessionmanager.SessionManager(server1c)
-    server1c.init_clusters()
-    server1c.init_bases()
-    for base_name in parser.args["base"]:
-        cl_base = server1c.get_clbase(base_name=base_name, usr=parser.usr, pwd=parser.pwd, **parser.args)
-        ds_base = basedata.get_designer_base(**parser.get_single_base_params())
+    def init_parser(self, parser_obj):
+        self.parser = parser_obj
+        self.fm = settings_1c.FileManager()
+        self.fm.init_bkp_pach(self.parser.args["pach"][0])
+        self.srv = self.parser.args["server"][0]
+        self.ds_base = basedata.get_designer_base(**self.parser.get_single_base_params())
 
-        tmp_dt = fm.tmp_bkp_filename(base_name, "dt")
-        dest_dt = fm.dest_bkp_filename(base_name, "dt")
+    def make_single_dump(self):
+        self.sm.terminate_all(self.base_name)
 
-        if srv == "localhost" or srv == socket.gethostname():
-            tmp_dt = dest_dt
-        print("***{} starting dump {}".format(settings_1c.str_cur_time(), base_name))
+        dest_dt = self.fm.dest_bkp_filename(self.base_name, "dt")
+        tmp_dt = dest_dt if connection_1c.localhost(self.srv) else self.fm.tmp_bkp_filename(self.base_name, "dt")
 
-        with baselock.BaseLock(cl_base, uc="bkp_bot_key", cmd_func=conn.cast) as bl:
-
-            sm.terminate_all(base_name)
-
+        sleep(5)
+        w = tw.ThreadWorker(ocv8.DesignerCommand(*self.ds_base.getparams(),
+                                                 "/UC {}".format("bkp_bot_key"),
+                                                 cmd_func=self.conn.cast,
+                                                 env="DISPLAY=:1").DumpIB)
+        if w.make_work((tmp_dt,), 1000):
+            print(w.get_data())
             sleep(5)
-            cv = ocv8.DesignerCommand(*ds_base.getparams(), "/UC {}".format("bkp_bot_key"), env="DISPLAY=:1", cmd_func=conn.cast)
-            w = tw.ThreadWorker(cv.DumpIB)
-            if w.make_work((tmp_dt, ), 1000):
-                print(w.get_data())
-                conn.cast("chmod a+r " + tmp_dt)
-                if tmp_dt != dest_dt:
-                    conn.move_file(tmp_dt, dest_dt)
-                print("***{} finished dump {}".format(settings_1c.str_cur_time(), base_name))
-            else:
-                list(map(conn.kill, conn.ps_grep(["1cv8", base_name])))
-                sleep(15)
-                print("***{} ERROR dump {}".format(settings_1c.str_cur_time(), base_name))
+            self.conn.cast("chmod a+r " + tmp_dt)
+            if tmp_dt != dest_dt:
+                self.conn.move_file(tmp_dt, dest_dt)
+            return True
+        else:
+            self.sm.terminate_all(self.base_name)
+            sleep(5)
+            print(list(map(self.conn.kill, self.conn.ps_grep(["1cv8", self.base_name]))))
+            sleep(15)
+            return False
+
+    def init_connection(self, conn_id):
+        self.conn = conn_id
+        self.server1c = server.Server(cmd_func=self.conn.cast, **self.parser.args)
+        self.sm = sessionmanager.SessionManager(self.server1c)
+        self.xvfb = xvfb.Xvfb(self.conn)
+        if not self.xvfb.status():
+            self.xvfb.start()
+            sleep(15)
+
+    def init_base(self, base_name_id):
+        self.base_name = base_name_id
+        self.cl_base = self.server1c.get_clbase(base_name=base_name_id,
+                                                usr=self.parser.usr,
+                                                pwd=self.parser.pwd,
+                                                **self.parser.args)
+
+    def make_dump(self):
+        print("***{} starting backup {}".format(settings_1c.str_cur_time(), self.srv))
+        with connection_1c.Connection(srv=self.srv, **self.parser.args) as conn:
+            dp.init_connection(conn)
+            for base_name in dp.parser.args["base"]:
+                dp.init_base(base_name)
+
+                print("***{} starting dump {}".format(settings_1c.str_cur_time(), dp.base_name))
+
+                with baselock.BaseLock(self.cl_base, uc="bkp_bot_key", cmd_func=self.conn.cast):
+                    sleep(5)
+                    dmp_status = "Finished" if dp.make_single_dump() else "FAILED"
+                    print("***{} {} dump {}".format(settings_1c.str_cur_time(), dmp_status, self.base_name))
+
+        print("***{} finished backup {}".format(settings_1c.str_cur_time(), self.srv))
 
 
-print("***{} finished backup {}".format(settings_1c.str_cur_time(), srv))
+if __name__ == "__main__":
+    parser = argparse_1c.ArgumentParser_1C("sBudkf", description=__doc__)
+    parser.add_argument('-p', '--pach',
+                        metavar="PACH",
+                        help='backup cat pach',
+                        nargs="*", type=str, required=False)
+    parser.decode_arg()
+    dp = DumpMaker()
+    dp.init_parser(parser)
+    dp.make_dump()

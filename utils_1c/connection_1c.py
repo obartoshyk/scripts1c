@@ -7,6 +7,10 @@ import shutil
 import types
 
 
+def localhost(srv):
+    return srv == "localhost" or srv == socket.gethostname()
+
+
 class RemoteConnection(object):
     """ Connection to 1C servers uses paramiko"""
 
@@ -81,7 +85,7 @@ class LocalConnection(object):
 class Connection(object):
     def __init__(self, srv="", **kwargs):
         super(Connection, self).__init__()
-        if srv == "localhost" or srv == socket.gethostname():
+        if localhost(srv):
             self.connection = LocalConnection()
         else:
             self.connection = RemoteConnection(srv=srv, **kwargs)
@@ -102,8 +106,8 @@ class Connection(object):
         cmd = "ps x"
         for grep_cmd in grep_list:
             cmd = "{} | grep {}".format(cmd, grep_cmd)
-        for str in conn.cast(cmd).split("\n"):
-            for wrd in str.split(" "):
+        for str_answ in conn.cast(cmd).split("\n"):
+            for wrd in str_answ.split(" "):
                 if wrd:
                     proc_list.append(wrd)
                     break
@@ -116,5 +120,4 @@ class Connection(object):
         if pid:
             cmd = "kill {}".format(pid)
             return conn.cast(cmd)
-
-
+        return ""
