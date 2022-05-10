@@ -56,11 +56,11 @@ def repack_deb(sets,update_sets):
 	tcat = "{0}/{1}".format(sets.update_cat,update_sets['upd_name'])
 	dest = "{0}.run".format(tcat)
 	if sets.test_mode:
-		print("deb: {0} =~> {1} =~> {2}".format(sourse,tcat,dest))
+		print("deb: {0} =~> {1} =~> {2}".format(sourse, tcat, dest))
 	else:	
 		os.mkdir(tcat)
-		os.system("tar -C {1} -zxvf {0}".format(sourse,tcat))
-		os.system("zip -j -r {0} {1}/*".format(dest,tcat))
+		os.system("tar -C {1} -zxvf {0}".format(sourse, tcat))
+		os.system("zip -j -r {0} {1}/*".format(dest, tcat))
 		shutil.rmtree(tcat, ignore_errors=True)
 		os.system("chmod a+r {0}".format(dest))
 
