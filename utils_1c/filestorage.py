@@ -20,8 +20,16 @@ class FileStorage(object):
                     old_files.append(path_to_file)
         return (corr for corr in old_files)
 
-    def put(self, file_pach, storage_pach):
-        self.conn.put(file_pach, storage_pach)
+    def put(self, pach):
+        self.create_pach(pach)
+        self.conn.put(pach, pach)
+
+    def create_pach(self, pach):
+        dirp = ""
+        for dir0 in (x for x in pach.split("/") if x):
+            dirp = "{}/{}".format(dirp, dir0)
+            if dirp != pach and not self.exists(dirp):
+                self.conn.mkdir(dirp)
 
     def get(self, pach):
         self.conn.get(pach, pach)
@@ -32,3 +40,6 @@ class FileStorage(object):
 
     def exists(self, pach):
         return self.conn.exists(pach)
+
+    def rm(self, pach):
+        return self.conn.rm(pach)

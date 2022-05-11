@@ -72,8 +72,8 @@ class RemoteConnection(object):
             self.get_sftp().get(tmp_dt, dest_dt)
 
     def put(self, tmp_dt, dest_dt):
-        if self.exists(tmp_dt):
-            self.get_sftp().put(tmp_dt, dest_dt)
+        self.get_sftp().put(tmp_dt, dest_dt)
+       #self.cast("chmod a+rwx {}".format(dest_dt))
 
     def walk(self, curr_dir):
         list_of_f = []
@@ -104,6 +104,15 @@ class RemoteConnection(object):
             return False
         return True
 
+    def mkdir(self, cat):
+        self.get_sftp().mkdir(cat)
+        self.cast("chmod a+rwx {}".format(cat))
+        return cat
+
+    def rm(self, pach):
+        self.get_sftp().remove(pach)
+        return pach
+
 
 class LocalConnection(object):
     def __init__(self):
@@ -128,6 +137,12 @@ class LocalConnection(object):
         shutil.copyfile(tmp_dt, dest_dt)
 
     @staticmethod
+    def mkdir(cat):
+        os.mkdir(cat)
+        os.popen("chmod a+rwx {}".format(cat))
+        return cat
+
+    @staticmethod
     def put(tmp_dt, dest_dt):
         shutil.copyfile(tmp_dt, dest_dt)
 
@@ -147,6 +162,11 @@ class LocalConnection(object):
     @staticmethod
     def exists(dest_dt):
         return os.path.exists(dest_dt)
+
+    @staticmethod
+    def rm(dest_dt):
+        os.remove(dest_dt)
+        return dest_dt
 
 
 class Connection(object):
