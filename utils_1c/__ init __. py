@@ -11,5 +11,6 @@ __all__ = ['argparse_1c',
            'sessionmanager',
            'settings_1c',
            'tw',
-           'xvfb'
+           'xvfb',
+           'filestorage'
            ]
