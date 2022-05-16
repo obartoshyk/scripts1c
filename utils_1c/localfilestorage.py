@@ -11,6 +11,8 @@ class FileStorage(object):
         self.srv = srv
         self.storage_path = storage_path
         self.ssh_key = kwargs["ssh_key"]
+        self.dirs_file_name = "/tmp/dirs.ini"
+        self.files_file_name = "/tmp/files.ini"
 
     def old_files(self, age=10):
         now = datetime.now()
@@ -25,7 +27,6 @@ class FileStorage(object):
 
     @staticmethod
     def cast(cmd):
-        print("cast {0}: {1}".format("LocalHost", cmd))
         pipe = subprocess.Popen(cmd,
                                 shell=True,
                                 stdout=subprocess.PIPE,
@@ -40,12 +41,12 @@ class FileStorage(object):
         return os.walk(self.storage_path)
 
     def put(self, file_path):
-        cmd = 'rsync -az "ssh -i {ssh_key}" "{file_path}" "root@{srv}:{file_path}"'
+        cmd = 'scp -i "{ssh_key}" "{file_path}" "root@{srv}:{file_path}"'
         self.cast(cmd.format(file_path=file_path, srv=self.srv, ssh_key=self.ssh_key))
         return file_path
 
     def get(self, file_path):
-        cmd = 'rsync -r -e "ssh -i {ssh_key}" root@{srv}:{file_path} {file_path}'
+        cmd = 'scp -i "{ssh_key}" root@{srv}:{file_path} {file_path}'
         self.cast(cmd.format(file_path=file_path, srv=self.srv, ssh_key=self.ssh_key))
         return file_path
 
@@ -76,19 +77,55 @@ class FileStorage(object):
                     created_dirs.append(dir)
         return created_dirs
 
-    def create_dirs(self, dirs):
-        cmd = 'ssh -i "{ssh_key}" root@{srv} mkdir -p "{dir_}"'
-        add_storage = lambda x: "/".join([self.storage_path, x])
-        for dir_ in dirs:
-            self.cast(cmd.format(dir_=add_storage(dir_),
-                                 srv=self.srv,
-                                 ssh_key=self.ssh_key))
-
-    def create_files(self, old_files):
-        for file_path in old_files:
-            self.put(file_path)
-
     def let_sync(self, age=10):
+        self.clear_cache()
         old_files = self.old_files(age=age)
-        self.create_dirs(self.get_created_dirs(old_files))
-        #self.create_files(old_files) - временно отключим
+        self.create_dir_file(self.get_created_dirs(old_files))
+        self.create_files_file(old_files)
+        self.send_ini()
+
+    def clear_cache(self):
+        if os.path.exists(self.dirs_file_name):
+            os.remove(self.dirs_file_name)
+        if os.path.exists(self.files_file_name):
+            os.remove(self.files_file_name)
+
+    def create_dir_file(self, dirs):
+        add_storage = lambda x: "{}\n".format("/".join([self.storage_path, x]))
+        with open(self.dirs_file_name, "w") as target_file:
+            target_file.writelines(list(map(add_storage, dirs)))
+
+    def create_files_file(self, old_files):
+        add_nl = lambda x: "{}\n".format(x)
+        with open(self.files_file_name, "w") as target_file:
+            target_file.writelines(list(map(add_nl, old_files)))
+
+    def send_ini(self):
+        self.put(self.dirs_file_name)
+        self.put(self.files_file_name)
+        self.clear_cache()
+
+    def get_sync(self):
+        if os.path.exists(self.dirs_file_name):
+            return 0
+        if os.path.exists(self.files_file_name):
+            return 0
+        self.create_dirs()
+        self.create_files()
+        self.clear_cache()
+
+    def create_dirs(self):
+        with open(self.dirs_file_name, "r") as target_file:
+            dir_name = target_file.readline()
+            while dir_name:
+                if not os.path.exists(dir_name):
+                    os.mkdir(dir_name)
+                dir_name = target_file.readline()
+
+    def create_files(self):
+        with open(self.dirs_file_name, "r") as target_file:
+            file_name = target_file.readline()
+            while file_name:
+                if not os.path.exists(file_name):
+                    self.get(file_name)
+                file_name = target_file.readline()
