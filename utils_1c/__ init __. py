@@ -12,5 +12,6 @@ __all__ = ['argparse_1c',
            'settings_1c',
            'tw',
            'xvfb',
-           'filestorage'
+           'filestorage',
+           "localfilestorage"
            ]

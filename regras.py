@@ -13,11 +13,7 @@ def reg(cast, platform="deb"):
     cast("{0} --daemon cluster".format(sets.ras_pach[platform]))
 
 
-parser = argparse_1c.ArgumentParser_1C("Sk", description=__doc__)
-parser.add_argument('-f', "--platform",
-                    metavar="DEB",
-                    help='deb/win',
-                    nargs=1, type=str, default="deb", required=False)
+parser = argparse_1c.ArgumentParser_1C("Skf", description=__doc__)
 parser.decode_arg()
 for srv in parser.args["server"]:
     with connection_1c.Connection(srv=srv, **parser.args) as conn:

@@ -7,7 +7,7 @@ reg zabbix agent after update version 1C
 from utils_1c import settings_1c, connection_1c, argparse_1c, server
 from io import BytesIO
 
-parser =argparse_1c.ArgumentParser_1C("sk",description=__doc__)
+parser =argparse_1c.ArgumentParser_1C("sk", description=__doc__)
 parser.add_argument('-p','--params' ,
 				metavar="param:base",
 				help='',

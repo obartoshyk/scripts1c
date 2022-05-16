@@ -20,6 +20,7 @@ class ArgumentParser_1C(argparse.ArgumentParser):
         self.add_d()
         self.add_k()
         self.add_platform()
+        self.add_gtmms()
 
     def decode_arg(self):
         args = vars(self.parse_args())
@@ -71,6 +72,14 @@ class ArgumentParser_1C(argparse.ArgumentParser):
                               nargs="*", type=str,
                               required=False)
 
+    def add_gtmms(self):
+        if self.modeline.find("l") != -1 or self.modeline.find("L") != -1:
+            self.add_argument('-l', '--gtmms',
+                              metavar="BASES",
+                              help='1C file storage path',
+                              nargs="*", type=str,
+                              required=False)
+
     def add_client(self):
         if self.modeline.find("c") != -1 or self.modeline.find("C") != -1:
             self.add_argument('-c', '--client',
@@ -108,7 +117,7 @@ class ArgumentParser_1C(argparse.ArgumentParser):
     def get_single_base_params(self):
         pl = ["srv", "server", "base",
               "usr", "pwd", "db_usr", "db_pwd",
-              "type", "cat_pach"]
+              "type", "cat_pach", "gtmms"]
         sb_params = {atr: getattr(self, atr) for atr in pl if hasattr(self, atr)}
         for k, v in self.args.items():
             if k in pl:
