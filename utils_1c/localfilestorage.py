@@ -3,7 +3,7 @@
 from datetime import datetime, timezone
 import os
 import subprocess
-
+import time
 
 class FileStorage(object):
     def __init__(self, storage_path="", srv="", **kwargs):
@@ -110,9 +110,11 @@ class FileStorage(object):
             return 0
         if os.path.exists(self.files_file_name):
             return 0
+        print("sync started: ", self.str_cur_time())
         self.create_dirs()
         self.create_files()
-        self.clear_cache()
+        #self.clear_cache()
+        print("sync finished: ", self.str_cur_time())
 
     def create_dirs(self):
         with open(self.dirs_file_name, "r") as target_file:
@@ -129,3 +131,20 @@ class FileStorage(object):
                 if n_name:
                     if not os.path.exists(n_name):
                         self.get(n_name)
+
+    def rm_files(self):
+        with open(self.files_file_name, "r") as target_file:
+            for line in target_file:
+                n_name = line.rstrip('\n')
+                if n_name:
+                    if not os.path.exists(n_name):
+                        self.get(n_name)
+
+    def str_cur_time(self):
+        lt = time.localtime(time.time())
+        return "{}/{:02}/{:02}:{:02}.{:02}.{:02}".format(lt.tm_year,
+                                                         lt.tm_mon,
+                                                         lt.tm_mday,
+                                                         lt.tm_hour,
+                                                         lt.tm_min,
+                                                         lt.tm_sec)
