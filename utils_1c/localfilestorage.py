@@ -77,7 +77,7 @@ class FileStorage(object):
                     created_dirs.append(dir)
         return created_dirs
 
-    def let_sync(self, age=10):
+    def sync_export(self, age=10):
         self.clear_cache()
         old_files = self.old_files(age=age)
         self.create_dir_file(self.get_created_dirs(old_files))
@@ -105,7 +105,7 @@ class FileStorage(object):
         self.put(self.files_file_name)
         self.clear_cache()
 
-    def get_sync(self):
+    def sync_import(self):
         if os.path.exists(self.dirs_file_name):
             return 0
         if os.path.exists(self.files_file_name):
