@@ -107,8 +107,10 @@ class FileStorage(object):
 
     def sync_import(self):
         if os.path.exists(self.dirs_file_name):
+            print("missing file: ", self.dirs_file_name)
             return 0
         if os.path.exists(self.files_file_name):
+            print("missing file: ", self.files_file_name)
             return 0
         print("sync started: ", self.str_cur_time())
         self.create_dirs()

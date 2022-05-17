@@ -16,7 +16,7 @@ parser.decode_arg()
 lst = localfilestorage.FileStorage(srv=parser.args["server"][0],
                                    storage_path=parser.args['gtmms'][0],
                                    **parser.args)
-
+print(parser.args['mode'][0], " from ", parser.args["server"][0])
 if parser.args['mode'][0] == "export":
     lst.sync_export(age=int(parser.args['time'][0]))
 elif parser.args['mode'][0] == "import":
