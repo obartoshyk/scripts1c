@@ -5,14 +5,15 @@ import os
 import subprocess
 import time
 
+
 class FileStorage(object):
-    def __init__(self, storage_path="", srv="", **kwargs):
+    def __init__(self, storage_path="", srv="", trn="", **kwargs):
         super(FileStorage, self).__init__()
         self.srv = srv
         self.storage_path = storage_path
         self.ssh_key = kwargs["ssh_key"]
-        self.dirs_file_name = "/tmp/dirs.ini"
-        self.files_file_name = "/tmp/files.ini"
+        self.dirs_file_name = "/tmp/dirs{}.ini".format(trn)
+        self.files_file_name = "/tmp/files{}.ini".format(trn)
 
     def old_files(self, age=10):
         now = datetime.now()
@@ -77,9 +78,8 @@ class FileStorage(object):
                     created_dirs.append(dir)
         return created_dirs
 
-    def sync_export(self, age=10):
+    def sync_export(self, old_files):
         self.clear_cache()
-        old_files = self.old_files(age=age)
         self.create_dir_file(self.get_created_dirs(old_files))
         self.create_files_file(old_files)
         self.send_ini()
