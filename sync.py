@@ -38,7 +38,6 @@ def tr(func, count, p):
     for t in threads:
         t.join()
 
-
 parser = argparse_1c.ArgumentParser_1C("sk", description=__doc__)
 parser.add_argument('-o', '--time',
                     metavar="TIME",
@@ -58,7 +57,7 @@ if parser.args['mode'][0] == "export":
     tr(sync_export, arr_list, parser)
 
 elif parser.args['mode'][0] == "import":
-    tr(sync_export, range(30), parser)
+    tr(sync_export, [x for x in range(30)], parser)
 
 
 
