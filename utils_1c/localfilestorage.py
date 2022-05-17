@@ -116,16 +116,16 @@ class FileStorage(object):
 
     def create_dirs(self):
         with open(self.dirs_file_name, "r") as target_file:
-            dir_name = target_file.readline()
-            while dir_name:
-                if not os.path.exists(dir_name):
-                    os.mkdir(dir_name)
-                dir_name = target_file.readline()
+            for line in target_file:
+                n_name = line.rstrip('\n')
+                if n_name:
+                    if not os.path.exists(n_name):
+                        os.mkdir(n_name)
 
     def create_files(self):
-        with open(self.dirs_file_name, "r") as target_file:
-            file_name = target_file.readline()
-            while file_name:
-                if not os.path.exists(file_name):
-                    self.get(file_name)
-                file_name = target_file.readline()
+        with open(self.files_file_name, "r") as target_file:
+            for line in target_file:
+                n_name = line.rstrip('\n')
+                if n_name:
+                    if not os.path.exists(n_name):
+                        self.get(n_name)
