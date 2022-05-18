@@ -6,6 +6,16 @@ import subprocess
 import time
 
 
+def str_cur_time():
+    lt = time.localtime(time.time())
+    return "{}/{:02}/{:02}:{:02}.{:02}.{:02}".format(lt.tm_year,
+                                                     lt.tm_mon,
+                                                     lt.tm_mday,
+                                                     lt.tm_hour,
+                                                     lt.tm_min,
+                                                     lt.tm_sec)
+
+
 class FileStorage(object):
     def __init__(self, storage_path="", srv="", trn="", **kwargs):
         super(FileStorage, self).__init__()
@@ -15,16 +25,35 @@ class FileStorage(object):
         self.dirs_file_name = "/tmp/dirs{}.ini".format(trn)
         self.files_file_name = "/tmp/files{}.ini".format(trn)
 
-    def old_files(self, age=10):
+    def old_files(self, age=365):
         now = datetime.now()
         old_files = []
         for pach, dirs, files in self.walk():
             for file in files:
                 path_to_file = "{}/{}".format(pach, file)
                 cr_date = datetime.fromtimestamp(self.stat(path_to_file).st_mtime, tz=timezone.utc)
-                if now.year - cr_date.year > age:
+                if (now - cr_date).days >= age:
                     old_files.append(path_to_file)
         return old_files
+
+    @staticmethod
+    def get_import_stream_counter():
+        dirs_file_tmpl = "/tmp/dirs{}.ini"
+        trn = 0
+        n_name = dirs_file_tmpl.format(str(trn))
+        while os.path.exists(n_name):
+            trn += 1
+            n_name = dirs_file_tmpl.format(str(trn))
+        return trn - 1
+
+    @staticmethod
+    def get_export_stream_counter(old_files):
+        if len(old_files) > 1000:
+            return 30
+        elif len(old_files) > 100:
+            return 5
+        else:
+            return 1
 
     @staticmethod
     def cast(cmd):
@@ -48,6 +77,11 @@ class FileStorage(object):
 
     def get(self, file_path):
         cmd = 'scp -i "{ssh_key}" root@{srv}:{file_path} {file_path}'
+        self.cast(cmd.format(file_path=file_path, srv=self.srv, ssh_key=self.ssh_key))
+        return file_path
+
+    def rm_ssh(self, file_path):
+        cmd = 'ssh -i "{ssh_key}" "root@{srv}" rm "{file_path}"'
         self.cast(cmd.format(file_path=file_path, srv=self.srv, ssh_key=self.ssh_key))
         return file_path
 
@@ -112,11 +146,17 @@ class FileStorage(object):
         if not os.path.exists(self.files_file_name):
             print("missing file: ", self.files_file_name)
             return 0
-        print("sync started: ", self.str_cur_time())
+        print("sync started: ", str_cur_time())
         self.create_dirs()
         self.create_files()
-        #self.clear_cache()
-        print("sync finished: ", self.str_cur_time())
+        print("sync finished: ", str_cur_time())
+
+    def sync_remove(self):
+        if not os.path.exists(self.files_file_name):
+            print("missing file: ", self.files_file_name)
+            return 0
+        self.rm_files()
+        self.clear_cache()
 
     def create_dirs(self):
         with open(self.dirs_file_name, "r") as target_file:
@@ -139,14 +179,5 @@ class FileStorage(object):
             for line in target_file:
                 n_name = line.rstrip('\n')
                 if n_name:
-                    if not os.path.exists(n_name):
-                        self.get(n_name)
-
-    def str_cur_time(self):
-        lt = time.localtime(time.time())
-        return "{}/{:02}/{:02}:{:02}.{:02}.{:02}".format(lt.tm_year,
-                                                         lt.tm_mon,
-                                                         lt.tm_mday,
-                                                         lt.tm_hour,
-                                                         lt.tm_min,
-                                                         lt.tm_sec)
+                    if os.path.exists(n_name):
+                        self.rm_ssh(n_name)
