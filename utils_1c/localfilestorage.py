@@ -26,7 +26,7 @@ class FileStorage(object):
         self.files_file_name = "/tmp/files{}.ini".format(trn)
 
     def old_files(self, age=365):
-        now = datetime.now()
+        now = datetime.now(timezone.utc)
         old_files = []
         for pach, dirs, files in self.walk():
             for file in files:
