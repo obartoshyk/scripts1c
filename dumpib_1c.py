@@ -47,6 +47,10 @@ class DumpMaker(object):
                 self.conn.move_file(tmp_dt, dest_dt)
             return True
         else:
+            print("Backup of {} IS FAILED restore base work!".format(self.base_name))
+            png_lg = "/tmp/{}{}_fail.png".format(self.base_name, settings_1c.str_cur_time())
+            self.conn.cast("DISPLAY=:1 xwd -root -silent | convert xwd:- png:{}".format(png_lg))
+            sleep(5)
             self.sm.terminate_all(self.base_name)
             sleep(5)
             print(list(map(self.conn.kill, self.conn.ps_grep(["1cv8", self.base_name]))))
@@ -72,15 +76,15 @@ class DumpMaker(object):
     def make_dump(self):
         print("***{} starting backup {}".format(settings_1c.str_cur_time(), self.srv))
         with connection_1c.Connection(srv=self.srv, **self.parser.args) as conn:
-            dp.init_connection(conn)
-            for base_name in dp.parser.args["base"]:
-                dp.init_base(base_name)
+            self.init_connection(conn)
+            for base_name in self.parser.args["base"]:
+                self.init_base(base_name)
 
-                print("***{} starting dump {}".format(settings_1c.str_cur_time(), dp.base_name))
+                print("***{} starting dump {}".format(settings_1c.str_cur_time(), self.base_name))
 
                 with baselock.BaseLock(self.cl_base, uc="bkp_bot_key", cmd_func=self.conn.cast):
                     sleep(5)
-                    dmp_status = "Finished" if dp.make_single_dump() else "FAILED"
+                    dmp_status = "Finished" if self.make_single_dump() else "FAILED"
                     print("***{} {} dump {}".format(settings_1c.str_cur_time(), dmp_status, self.base_name))
 
         print("***{} finished backup {}".format(settings_1c.str_cur_time(), self.srv))

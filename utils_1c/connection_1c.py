@@ -6,6 +6,7 @@ import socket
 import shutil
 import types
 from stat import S_ISDIR, S_ISREG
+from . import settings_1c
 
 
 def localhost(srv):
@@ -49,12 +50,12 @@ class RemoteConnection(object):
         return self.sftp
 
     def cast(self, cmd):
-        print("cast {0}: {1}".format(self.srv, cmd))
+        print("cast {0} {1}: {2}".format(self.srv, settings_1c.str_cur_time(), cmd))
         stdin, stdout, stderr = self.ssh.exec_command(cmd)
         data = stdout.read().decode()
         err = stderr.read().decode()
         if err:
-            print("cast ERROR: {}".format(err))
+            print("cast ERROR {0}: {1}".format(settings_1c.str_cur_time(), err))
         else:
             return data
 
@@ -148,7 +149,7 @@ class LocalConnection(object):
 
     @staticmethod
     def cast(cmd):
-        print("cast {0}: {1}".format("LocalHost", cmd))
+        print("cast LocalHost {0}: {1}".format(settings_1c.str_cur_time(), cmd))
         return os.popen(cmd).read()
 
     @staticmethod
