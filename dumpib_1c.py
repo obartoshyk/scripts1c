@@ -30,11 +30,11 @@ class DumpMaker(object):
 
     def make_single_dump(self):
         self.sm.terminate_all(self.base_name)
-
+        self.conn.cast("/etc/init.d/srv1cv83 restart")
         dest_dt = self.fm.dest_bkp_filename(self.base_name, "dt")
         tmp_dt = dest_dt if connection_1c.localhost(self.srv) else self.fm.tmp_bkp_filename(self.base_name, "dt")
 
-        sleep(5)
+        sleep(40)
         w = tw.ThreadWorker(ocv8.DesignerCommand(*self.ds_base.getparams(),
                                                  "/UC {}".format("bkp_bot_key"),
                                                  cmd_func=self.conn.cast,
@@ -48,7 +48,7 @@ class DumpMaker(object):
             return True
         else:
             print("Backup of {} IS FAILED restore base work!".format(self.base_name))
-            png_lg = "/tmp/{}{}_fail.png".format(self.base_name, settings_1c.str_cur_time())
+            png_lg = "/tmp/{}{}_fail.png".format(self.base_name, settings_1c.cur_time_f())
             self.conn.cast("DISPLAY=:1 xwd -root -silent | convert xwd:- png:{}".format(png_lg))
             sleep(5)
             self.sm.terminate_all(self.base_name)
