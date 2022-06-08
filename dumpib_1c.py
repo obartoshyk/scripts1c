@@ -30,16 +30,16 @@ class DumpMaker(object):
 
     def make_single_dump(self):
         self.sm.terminate_all(self.base_name)
-        self.conn.cast("/etc/init.d/srv1cv83 restart")
+        #self.conn.cast("/etc/init.d/srv1cv83 restart")
         dest_dt = self.fm.dest_bkp_filename(self.base_name, "dt")
         tmp_dt = dest_dt if connection_1c.localhost(self.srv) else self.fm.tmp_bkp_filename(self.base_name, "dt")
 
-        sleep(40)
+        sleep(20)
         w = tw.ThreadWorker(ocv8.DesignerCommand(*self.ds_base.getparams(),
                                                  "/UC {}".format("bkp_bot_key"),
                                                  cmd_func=self.conn.cast,
                                                  env="DISPLAY=:1").DumpIB)
-        if w.make_work((tmp_dt,), 5000):
+        if w.make_work((tmp_dt,), 3600):
             print(w.get_data())
             sleep(5)
             self.conn.cast("chmod a+r " + tmp_dt)
