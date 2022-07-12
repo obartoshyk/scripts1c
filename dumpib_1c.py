@@ -39,7 +39,7 @@ class DumpMaker(object):
                                                  "/UC {}".format("bkp_bot_key"),
                                                  cmd_func=self.conn.cast,
                                                  env="DISPLAY=:1").DumpIB)
-        if w.make_work((tmp_dt,), 3600):
+        if w.make_work((tmp_dt,), 7200):
             print(w.get_data())
             sleep(5)
             self.conn.cast("chmod a+r " + tmp_dt)

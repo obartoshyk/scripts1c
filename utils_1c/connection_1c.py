@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 import os
-import paramiko
 import socket
 import shutil
 import types
+import paramiko
 from stat import S_ISDIR, S_ISREG
 from . import settings_1c
 
