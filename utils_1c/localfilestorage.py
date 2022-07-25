@@ -78,6 +78,8 @@ class FileStorage(object):
     def get(self, file_path):
         cmd = 'scp -i "{ssh_key}" root@{srv}:{file_path} {file_path}'
         self.cast(cmd.format(file_path=file_path, srv=self.srv, ssh_key=self.ssh_key))
+        cmd = 'chmod a+rw "{file_path}"'
+        self.cast(cmd.format(file_path=file_path))
         return file_path
 
     def rm_ssh(self, file_path):
