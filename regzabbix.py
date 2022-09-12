@@ -23,9 +23,9 @@ with connection_1c.Connection(srv=parser.args["server"][0], **parser.args) as co
 	st = []
 	b = "UserParameter={param}, {rac_pach} session --cluster={cluster} list --infobase={infobase} | grep -i user-name | wc -l"
 	n = "UserParameter={param}, {rac_pach} session --cluster={cluster} list | grep -i user-name | wc -l"
-	for pb in parser.args["params"]:
+	for pb in parser.args["params"][0].split(','):
 		param, base = pb.split(':')
-		if base:
+		if base and base != "NONE":
 			st.append(b.format(param=param,
 							rac_pach=sets.rac_pach["deb"],
 							**server1c.get_base(base)))
