@@ -10,7 +10,7 @@ def reg(cast, platform="deb"):
     if len(answ) > 2:
         for k in range(1, len(answ) - 1):
             cast('kill {0}'.format(answ[k]))
-    cast("{0} --daemon cluster".format(sets.ras_pach[platform]))
+    cast("{0} cluster --daemon".format(sets.ras_pach[platform]))
 
 
 parser = argparse_1c.ArgumentParser_1C("Skf", description=__doc__)
