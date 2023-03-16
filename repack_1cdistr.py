@@ -68,7 +68,7 @@ def repack_deb(sets,update_sets):
 if __name__ == "__main__":
 	sets = settings_1c.Settings()
 	parser =argparse_1c.ArgumentParser_1C("Sk",description=__doc__)
-	parser.add_argument('-r','--repack' ,help='Repack archives mode',action='store_true', default=False)
+	parser.add_argument('-r','--repack' ,help='Repack archives mode',action='store_true', default=False, required=False)
 	parser.add_argument('-p','--update_cat' ,	metavar="~PACH",help='pach to update distr(+ add v.1C)',nargs=1,type=str, required=True)
 	parser.decode_arg()
 	sets.test_mode = parser.args["test"]
