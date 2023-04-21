@@ -4,7 +4,7 @@ import os
 import socket
 import shutil
 import types
-import paramiko
+
 from stat import S_ISDIR, S_ISREG
 from . import settings_1c
 
@@ -18,6 +18,7 @@ class RemoteConnection(object):
 
     def __init__(self, srv="", **kwargs):
         super(RemoteConnection, self).__init__()
+        import paramiko
         self.srv = srv
         self.ssh_key = kwargs["ssh_key"]
 
