@@ -14,7 +14,7 @@ def localhost(srv):
 
 
 class RemoteConnection(object):
-    """ Connection to 1C servers uses paramiko"""
+    """ Connection to 1C servers uses paramiko """
 
     def __init__(self, srv="", **kwargs):
         super(RemoteConnection, self).__init__()
