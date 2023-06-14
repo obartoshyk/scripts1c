@@ -16,6 +16,12 @@ def cur_time_f():
                                                      lt.tm_sec)
 
 
+def str_cur_time_str():
+    lt = time.localtime(time.time())
+    return "{}{:02}{:02}{:02}{:02}{:02}".format(lt.tm_year, lt.tm_mon, lt.tm_mday, lt.tm_hour, lt.tm_min,
+                                                     lt.tm_sec)
+
+
 class Settings(object):
     """default options to use 1C scripts"""
 
