@@ -44,9 +44,9 @@ class DesignerCommand(comand_1c.CommandMaker):
     def RollbackCfg(self):
         return self.run("", "/RollbackCfg")
 
-    def DumpExternalDataProcessorOrReportToFiles(self, root_xmf, out_file):
-        return self.run("", "/DumpExternalDataProcessorOrReportToFiles", root_xmf, out_file)
+    def DumpExternalDataProcessorOrReportToFiles(self, root_xml, out_file, log_file):
+        return self.run("", "/DumpExternalDataProcessorOrReportToFiles", root_xml, out_file, "/Out", log_file)
 
-    def LoadExternalDataProcessorOrReportFromFiles(self, root_xmf, out_file):
-        return self.run("", "/LoadExternalDataProcessorOrReportFromFiles", root_xmf, out_file)
+    def LoadExternalDataProcessorOrReportFromFiles(self, root_xml, out_file, log_file):
+        return self.run("", "/LoadExternalDataProcessorOrReportFromFiles", root_xml, out_file, "/Out", log_file)
 
