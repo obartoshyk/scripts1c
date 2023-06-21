@@ -24,7 +24,7 @@ with connection_1c.Connection(srv=srv, **parser.args) as conn:
         raise Exception("Base is locked by process: {}".format(pid))
 
     ds_base = basedata.get_designer_base(**parser.get_single_base_params())
-    repo = rep.Repository(parser.args["repozitory"][0])
+    repo = rep.Repository(parser)
 
     cv = ocv8.DesignerCommand(*ds_base.getparams(), "/UC {}".format("bkp_bot_key"), env="DISPLAY=:1",
                               cmd_func=conn.cast)

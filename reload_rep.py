@@ -22,7 +22,7 @@ with connection_1c.Connection(srv=srv, **parser.args) as conn:
 
     i_comand = infobase_comand.InfobaseCommand(*ibcmd_base.getparams(),
                                                cmd_func=conn.cast)
-    repo = rep.Repository(parser.args["repozitory"][0])
+    repo = rep.Repository(parser)
     cast_cmd_list(conn, repo.get_start_reload_cmd())
     print(i_comand.config_import(repo.pach))
     print(i_comand.config_apply())
