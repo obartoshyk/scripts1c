@@ -122,9 +122,8 @@ class RepositoryPlugins(Repository):
         return {k: gl[k] for k in gl if gl[k]}
 
     def update_log(self):
-        s = "\n".join(self.log)
-        cmd = 'echo {} > {}'.format(s, self.log)
-        self.conn.cast(cmd)
+        for c in self.commits:
+            self.conn.cast('echo {} >> {}'.format(c, self.log))
 
     def clear_export(self):
         for xp, file in self.exp:
@@ -133,4 +132,3 @@ class RepositoryPlugins(Repository):
     def clear_import(self, sender):
         sender.send_pull_note()
         self.update_log()
-
