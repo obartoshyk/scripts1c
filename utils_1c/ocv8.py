@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 from . import comand_1c
+from . import settings_1c
 
 
 class DesignerCommand(comand_1c.CommandMaker):
@@ -50,3 +51,9 @@ class DesignerCommand(comand_1c.CommandMaker):
     def LoadExternalDataProcessorOrReportFromFiles(self, root_xml, out_file, log_file):
         return self.run("", "/LoadExternalDataProcessorOrReportFromFiles", root_xml, out_file, "/Out", log_file)
 
+    def convert_plugins(self, rp):
+        log = "/tmp/PluginConverter_{}.txt".format(settings_1c.str_cur_time_str())
+        for xml, ext in rp.imp:
+            self.LoadExternalDataProcessorOrReportFromFiles(xml, ext, log)
+        for xml, ext in rp.exp:
+            self.DumpExternalDataProcessorOrReportToFiles(xml, ext, log)
