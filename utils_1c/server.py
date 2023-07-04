@@ -3,6 +3,7 @@
 from . import comand_1c
 from . import basedata
 
+
 class Server(comand_1c.CommandMaker):
     """Server of 1C info bases"""
 
@@ -11,8 +12,10 @@ class Server(comand_1c.CommandMaker):
         comand_1c.CommandMaker.__init__(self, *args, command="rac", **kwargs)
         self.clusters_list = []
         self.bases_dict = {}
+        self.env = ""
 
     def init_clusters(self):
+        print("init_clusters")
         answ = self.run("cluster list | grep cluster")
         for curr_cluster in self.takekeys(answ):
             self.clusters_list.append(curr_cluster["cluster"])
@@ -35,6 +38,7 @@ class Server(comand_1c.CommandMaker):
         return self.get_bases()[base]
 
     def get_clbase(self, base_name="", **kwargs):
+        print("base_name: ", base_name)
         cur_base = self.get_base(base_name)
         return basedata.ClusterBase(cluster=cur_base["cluster"],
                                     infobase=cur_base["infobase"],

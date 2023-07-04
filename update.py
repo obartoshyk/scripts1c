@@ -40,6 +40,7 @@ with connection_1c.Connection(srv=srv, **parser.args) as conn:
         done = w.make_work((repo.pach, True, outlog), 300000)
     else:
         server1c = server.Server(cmd_func=conn.cast, **parser.args)
+
         cl_base = server1c.get_clbase(base_name=base, usr=parser.usr, pwd=parser.pwd, **parser.args)
         with baselock.BaseLock(cl_base, uc="bkp_bot_key", cmd_func=conn.cast) as bl:
             sm = sessionmanager.SessionManager(server1c)
