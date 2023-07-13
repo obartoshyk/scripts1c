@@ -86,7 +86,7 @@ class ArgumentParser_1C(argparse.ArgumentParser):
                               metavar="CLIENTS",
                               help='1C Clients list(empty=ALL)',
                               nargs="*", type=str,
-                              required=False)
+                              required=True)
 
     def add_user(self):
         if self.modeline.find("u") != -1:

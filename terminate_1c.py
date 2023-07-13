@@ -7,7 +7,7 @@ from utils_1c import connection_1c, argparse_1c, server, sessionmanager
 
 
 def terminate(sm, base, c):
-	if c:
+	if c != "NONE":
 		sm.terminate_sessions(base, c)
 	else:
 		sm.terminate_all(base)
@@ -26,5 +26,4 @@ for srv in parser.args["server"]:
 		server1c.init_clusters()
 		server1c.init_bases()
 		for base_name in parser.args["base"] if parser.args["base"] else server1c.get_bases():
-			sm.terminate_all(base_name)
-			#terminate(sm, base_name, parser.args["client"])
+			terminate(sm, base_name, parser.args["client"][0])

@@ -25,10 +25,10 @@ class SessionManager(object):
             answ.append(self.terminate_session(cluster, curr_sess["session"]))
         return answ
 
-    def terminate_sessions(self, base, user_list):
+    def terminate_sessions(self, base, user):
         answ = []
         cluster = self.server.get_base(base)["cluster"]
         for curr_sess in self.current_sessions(base):
-            if curr_sess["user-name"] in user_list:
+            if curr_sess["user-name"] == user.lstrip():
                 answ.append(self.terminate_session(cluster, curr_sess["session"]))
         return answ
