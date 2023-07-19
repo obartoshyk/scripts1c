@@ -11,13 +11,19 @@ import os
 import time
 from utils_1c import settings_1c, connection_1c, argparse_1c
 
-
-
-def ibsrv_start_cmd(pach, c_file):
+def ibsrv_start_cmd_daemon(pach, c_file):
     return '{ibsrv_pach} \
         -c 	"{pach}/conf/{basename}.yaml"  \
         --data "{pach}/{basename}_wdr"  \
         --daemon'.format(
+        ibsrv_pach=settings_1c.Settings().ibsrv_pach["deb"],
+        pach=pach,
+        basename=c_file.replace(".yaml", ""))
+
+def ibsrv_start_cmd(pach, c_file):
+    return '{ibsrv_pach} \
+        -c 	"{pach}/conf/{basename}.yaml"  \
+        --data "{pach}/{basename}_wdr"'.format(
         ibsrv_pach=settings_1c.Settings().ibsrv_pach["deb"],
         pach=pach,
         basename=c_file.replace(".yaml", ""))
