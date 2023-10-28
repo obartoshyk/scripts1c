@@ -93,8 +93,8 @@ class IbSrv(object):
         return cmdlist
 
     def local_remote_get_ports(self, find_cmd, n=1):
-        cmd = "comm - 23 < (seq 1590 5000 | sort) < (ss - Htan | awk '{print $4}'  \
-              | cut -d':' -f2 | sort -u) | shuf | head - n {}"
+        cmd = "comm - 23 < (seq 1590 5000 | sort) < (ss - Htan | awk '{print $4}' | cut -d':' -f2 | sort -u) | shuf | head - n {}"
+        #print(cmd.format(n))
         self.ports = find_cmd(cmd.format(n)).split("\n")
 
     def remote(self, mode, con):
