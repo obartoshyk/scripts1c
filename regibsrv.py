@@ -11,26 +11,37 @@ import os
 import time
 from utils_1c import settings_1c, connection_1c, argparse_1c
 
-def ibsrv_start_cmd_daemon(pach, c_file):
+def ibsrv_start_cmd_daemon(pach, c_file, port=1541):
+
     return '{ibsrv_pach} \
         -c 	"{pach}/conf/{basename}.yaml"  \
         --data "{pach}/{basename}_wdr"  \
+        --direct-regport {regport}  \
         --daemon'.format(
         ibsrv_pach=settings_1c.Settings().ibsrv_pach["deb"],
         pach=pach,
-        basename=c_file.replace(".yaml", ""))
+        basename=c_file.replace(".yaml", ""),
+        regport="{0}".format(port))
 
-def ibsrv_start_cmd(pach, c_file):
+
+def ibsrv_start_cmd(pach, c_file, port=1541):
     return '{ibsrv_pach} \
         -c 	"{pach}/conf/{basename}.yaml"  \
-        --data "{pach}/{basename}_wdr"'.format(
+        --data "{pach}/{basename}_wdr" \
+        --direct-regport {regport}'.format(
         ibsrv_pach=settings_1c.Settings().ibsrv_pach["deb"],
         pach=pach,
-        basename=c_file.replace(".yaml", ""))
+        basename=c_file.replace(".yaml", ""),
+        regport="{0}".format(port))
 
 
-def ibsrv_start_cmd_list(pach, source):
-    return [ibsrv_start_cmd(pach, c_) for c_ in source.listdir("{0}/conf".format(pach))]
+def ibsrv_start_cmd_list(pach, source, ports):
+    i = 0
+    cmd_list = []
+    for c_ in source.listdir("{0}/conf".format(pach)):
+        cmd_list.append(ibsrv_start_cmd(pach, c_, ports[i]))
+        i = i+1
+    return cmd_list
 
 
 def kill_list(answer, base):
@@ -51,6 +62,7 @@ class IbSrv(object):
         self.test = test
         self.base = base
         self.pach = pach
+        self.ports = []
 
     def cmd_run(self, cmd_func, cmd_list):
         for cmd in cmd_list:
@@ -65,6 +77,7 @@ class IbSrv(object):
         if mode == "restart" and not self.test:
             time.sleep(5)
         if mode != "stop":
+            self.local_remote_get_ports(lambda x: os.popen(x).read(), 20)
             cmdline = self.local_remote_start_list(os)
             self.cmd_run(lambda x: os.system(x), cmdline)
 
@@ -76,8 +89,13 @@ class IbSrv(object):
         if self.base == "all":
             cmdlist = ibsrv_start_cmd_list(self.pach, source)
         else:
-            cmdlist = [ibsrv_start_cmd(self.pach, self.base)]
+            cmdlist = [ibsrv_start_cmd(self.pach, self.base, self.ports[0])]
         return cmdlist
+
+    def local_remote_get_ports(self, find_cmd, n=1):
+        cmd = "comm - 23 < (seq 1590 5000 | sort) < (ss - Htan | awk '{print $4}'  \
+              | cut -d':' -f2 | sort -u) | shuf | head - n {}"
+        self.ports = find_cmd(cmd.format(n)).split("\n")
 
     def remote(self, mode, con):
         if mode != "start":
@@ -88,6 +106,7 @@ class IbSrv(object):
         if mode != "stop":
             ftp = con.ssh.open_sftp()
             if ftp:
+                self.local_remote_get_ports(lambda x: con.cast(x), 20)
                 cmdlist = self.local_remote_start_list(ftp)
                 self.cmd_run(lambda x: con.cast(x), cmdlist)
                 ftp.close()
