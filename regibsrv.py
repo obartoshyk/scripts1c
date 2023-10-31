@@ -99,6 +99,7 @@ class IbSrv(object):
         i = 0
         while port <= max_port and i < n:
             try:
+                print(port)
                 sock.bind(('', port))
                 sock.close()
                 i = i+1
