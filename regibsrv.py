@@ -97,6 +97,8 @@ class IbSrv(object):
               | cut -d':' -f2 | sort -u) | shuf | head - n {}"
         #print(cmd.format(n))
         self.ports = find_cmd(cmd.format(n)).split("\n")
+        print(self.ports)
+        print("0:", self.ports[0])
 
     def remote(self, mode, con):
         if mode != "start":
