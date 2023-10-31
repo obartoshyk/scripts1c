@@ -102,8 +102,9 @@ class IbSrv(object):
                 print(port)
                 sock.bind(('', port))
                 sock.close()
-                i = i+1
+                i += 1
                 self.ports.append(port)
+                port += 1
             except OSError:
                 port += 1
         raise IOError('no free ports')
