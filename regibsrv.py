@@ -11,6 +11,7 @@ import os
 import time
 from utils_1c import settings_1c, connection_1c, argparse_1c
 
+
 def ibsrv_start_cmd_daemon(pach, c_file, port=1541):
 
     return '{ibsrv_pach} \
@@ -77,7 +78,7 @@ class IbSrv(object):
         if mode == "restart" and not self.test:
             time.sleep(5)
         if mode != "stop":
-            self.local_remote_get_ports(lambda x: os.popen(x).read(), 20)
+            self.local_free_ports(1600, 5000, 20)
             cmdline = self.local_remote_start_list(os)
             self.cmd_run(lambda x: os.system(x), cmdline)
 
@@ -92,10 +93,24 @@ class IbSrv(object):
             cmdlist = [ibsrv_start_cmd(self.pach, self.base, self.ports[0])]
         return cmdlist
 
+    def local_free_ports(self, port=1024, max_port=65535, n=1):
+        import socket
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        i = 0
+        while port <= max_port and i < n:
+            try:
+                sock.bind(('', port))
+                sock.close()
+                i = i+1
+                self.ports.append(port)
+            except OSError:
+                port += 1
+        raise IOError('no free ports')
+
     def local_remote_get_ports(self, find_cmd, n=1):
         cmd = "comm - 23 < (seq 1590 5000 | sort) < (ss - Htan | awk '{{print $4}}'  \
               | cut -d':' -f2 | sort -u) | shuf | head - n {}"
-        #print(cmd.format(n))
+        print(cmd.format(n))
         self.ports = find_cmd(cmd.format(n)).split("\n")
         print(self.ports)
         print("0:", self.ports[0])
