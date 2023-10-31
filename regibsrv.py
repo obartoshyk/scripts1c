@@ -9,7 +9,31 @@ usage:
 """
 import os
 import time
+import socket
 from utils_1c import settings_1c, connection_1c, argparse_1c
+
+
+def next_free_port(port=1024, max_port=65535):
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    while port <= max_port:
+        try:
+            sock.bind(('', port))
+            sock.close()
+            return port
+        except OSError:
+            port += 1
+    raise IOError('no free ports')
+
+
+def local_free_ports(port=1024, max_port=65535, n=1):
+    ports = []
+    sport = port
+    while len(ports) < n:
+        sport = next_free_port(sport, max_port)
+        ports.append(sport)
+        sport += 1
+    return ports
+
 
 
 def ibsrv_start_cmd_daemon(pach, c_file, port=1541):
@@ -78,7 +102,7 @@ class IbSrv(object):
         if mode == "restart" and not self.test:
             time.sleep(5)
         if mode != "stop":
-            self.local_free_ports(1600, 5000, 20)
+            self.ports = local_free_ports(1600, 5000, 20)
             cmdline = self.local_remote_start_list(os)
             self.cmd_run(lambda x: os.system(x), cmdline)
 
@@ -92,22 +116,6 @@ class IbSrv(object):
         else:
             cmdlist = [ibsrv_start_cmd(self.pach, self.base, self.ports[0])]
         return cmdlist
-
-    def local_free_ports(self, port=1024, max_port=65535, n=1):
-        import socket
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        i = 0
-        while port <= max_port and i < n:
-            try:
-                print(port)
-                sock.bind(('', port))
-                sock.close()
-                i += 1
-                self.ports.append(port)
-                port += 1
-            except OSError:
-                port += 1
-        raise IOError('no free ports')
 
     def local_remote_get_ports(self, find_cmd, n=1):
         cmd = "comm - 23 < (seq 1590 5000 | sort) < (ss - Htan | awk '{{print $4}}'  \
