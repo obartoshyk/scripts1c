@@ -31,6 +31,9 @@ class InfobaseCommand(comand_1c.CommandMaker):
     def config_apply(self):
         return self.run("infobase config apply", "--force")
 
+    def config_reset(self):
+        return self.run("infobase config reset")
+
     def dump(self, tmpfile):
         return self.run("infobase dump", tmpfile)
 
