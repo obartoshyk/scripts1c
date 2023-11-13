@@ -18,7 +18,7 @@ def config_run(icomand, method, tmpfile=""):
         "load": ["config_load", "config_apply"],
         "export_sync": ["config_export_sync"],
         "export": ["config_export"],
-        "import": ["config_import", "config_apply"],
+        "import": ["config_reset, config_import", "config_apply"],
         "dump": ["dump"],
         "restore": ["restore"]
     }
