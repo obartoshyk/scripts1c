@@ -28,10 +28,10 @@ class InfobaseCommand(comand_1c.CommandMaker):
     def config_import(self, tmpfile):
         return self.run("infobase config import", tmpfile)
 
-    def config_apply(self):
+    def config_apply(self, *args):
         return self.run("infobase config apply", "--force")
 
-    def config_reset(self):
+    def config_reset(self, *args):
         return self.run("infobase config reset")
 
     def dump(self, tmpfile):
