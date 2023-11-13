@@ -22,9 +22,8 @@ def config_run(icomand, method, tmpfile=""):
         "dump": ["dump"],
         "restore": ["restore"]
     }
-    method_list = methods[method]
     for icmd in methods[method]:
-        print(getattr(icomand, method_list[icmd])(tmpfile))
+        print(getattr(icomand, icmd)(tmpfile))
 
 
 parser = argparse_1c.ArgumentParser_1C("sbkduf", description=__doc__)
