@@ -23,9 +23,8 @@ def config_run(icomand, method, tmpfile=""):
         "restore": ["restore"]
     }
     method_list = methods[method]
-    print(getattr(icomand, method_list[0])(tmpfile))
-    if len(method_list) > 1:
-        print(getattr(icomand, method_list[1])())
+    for icmd in methods[method]:
+        print(getattr(icomand, method_list[icmd])(tmpfile))
 
 
 parser = argparse_1c.ArgumentParser_1C("sbkduf", description=__doc__)
