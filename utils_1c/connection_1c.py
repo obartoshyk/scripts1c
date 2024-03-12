@@ -31,7 +31,13 @@ class RemoteConnection(object):
         self.sftp_open = False
 
     def __enter__(self) -> object:
-        self.ssh.connect(hostname=self.srv, username='root', key_filename=self.ssh_key)
+        self.ssh.connect(
+            hostname=self.srv,
+            username='root',
+            key_filename=self.ssh_key,
+            disabled_algorithms={'pubkeys': ['rsa-sha2-256', 'rsa-sha2-512']}
+        )
+
         return self
 
     def __exit__(self, type1, value, traceback):
