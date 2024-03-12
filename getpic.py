@@ -7,7 +7,6 @@ from time import sleep
 parser = argparse_1c.ArgumentParser_1C("sBudkf", description=__doc__)
 parser.decode_arg()
 
-print(parser.args)
 with connection_1c.Connection(srv=parser.args["server"][0], **parser.args) as conn:
     tmp_dt = '/tmp/screenshot.png'
     conn.cast("DISPLAY=:1 xwd -root -silent | convert xwd:- png:{}".format(tmp_dt))
