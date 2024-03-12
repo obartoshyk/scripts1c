@@ -117,7 +117,7 @@ class ArgumentParser_1C(argparse.ArgumentParser):
     def get_single_base_params(self):
         pl = ["srv", "server", "base",
               "usr", "pwd", "db_usr", "db_pwd",
-              "type", "cat_pach", "gtmms"]
+              "type", "cat_pach", "gtmms", "env"]
         sb_params = {atr: getattr(self, atr) for atr in pl if hasattr(self, atr)}
         for k, v in self.args.items():
             if k in pl:

@@ -45,6 +45,11 @@ class DesignerPostgresBase(comand_1c.RunnerParams):
         self.bparams.append('/N "{0}"'.format(kwargs["usr"]))
         if kwargs["pwd"]:
             self.bparams.append('/P "{0}"'.format(kwargs["pwd"]))
+        self.outlog = '/tmp/{0}.log'.format(kwargs["base"])
+        try:
+            self.env = kwargs["env"]
+        except:
+            self.env = ""
 
     def get_process_template(self):
         return self.bparams[1]
@@ -59,6 +64,11 @@ class DesignerFileBase(comand_1c.RunnerParams):
         self.bparams.append('/N "{0}"'.format(kwargs["usr"]))
         if kwargs["pwd"]:
             self.bparams.append('/P "{0}"'.format(kwargs["pwd"]))
+        self.outlog = '/tmp/{0}.log'.format(kwargs["base"].split("/")[-1])
+        try:
+            self.env = kwargs["env"]
+        except:
+            self.env = ""
 
     def get_process_template(self):
         return self.bparams[1]

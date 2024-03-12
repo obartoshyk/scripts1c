@@ -22,7 +22,6 @@ class Runner(RunnerParams):
             self.env = ""
 
     def run(self, cmd0, *args):
-        print(self.env)
         farg = []
         if self.env:
             farg.append(self.env)

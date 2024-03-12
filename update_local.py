@@ -25,35 +25,17 @@ with connection_1c.Connection(srv=srv, **parser.args) as conn:
 
     ds_base = basedata.get_designer_base(**parser.get_single_base_params())
     repo = rep.Repository(parser)
-
+    cast_cmd_list(conn, repo.get_pull_cmd("origin master"))
     cv = ocv8.DesignerCommand(*ds_base.getparams(),
                               "/UC {}".format("bkp_bot_key"),
                               env=ds_base.env,
                               cmd_func=conn.cast)
-    cast_cmd_list(conn, repo.get_pull_cmd("origin master"))
 
     conn.cast('[ -e "{0}" ] && rm -r {0}'.format(ds_base.outlog))
-    w = tw.ThreadWorker(cv.LoadConfigFromFilesUPD)
     try:
         dynamic = parser.args["dynamic"]
     except:
         dynamic = False
-    if dynamic:
-        done = w.make_work((repo.pach, True, ds_base.outlog), 300000)
-    else:
-        server1c = server.Server(cmd_func=conn.cast, **parser.args)
-
-        cl_base = server1c.get_clbase(base_name=base, usr=parser.usr, pwd=parser.pwd, **parser.args)
-        with baselock.BaseLock(cl_base, uc="bkp_bot_key", cmd_func=conn.cast) as bl:
-            sm = sessionmanager.SessionManager(server1c)
-            sm.terminate_all(base)
-            done = w.make_work((repo.pach, False, ds_base.outlog), 300000)
-    if done:
-        print(conn.cast('cat {}'.format(ds_base.outlog)))
-    else:
-        sleep(20)
-        answ = conn.cast("ps x | grep 1cv8 | grep {} | cut -d ' ' -f 1".format(base)).split("\n")
-        for k in range(0, len(answ) - 1):
-            conn.cast('kill {0}'.format(answ[k]))
-        print("!!!ERROR update {}".format(base))
+    cv.LoadConfigFromFilesUPD(repo.pach, dynamic, ds_base.outlog)
+    conn.cast("cat {0}".format(ds_base.outlog))
     conn.cast('[ -e "{0}" ] && rm -r {0}'.format(ds_base.outlog))
