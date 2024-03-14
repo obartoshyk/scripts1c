@@ -20,6 +20,8 @@ srv = parser.args["server"][0]
 base = parser.args["base"][0]
 
 with connection_1c.Connection(srv=srv, **parser.args) as conn:
+    for pid in conn.ps_grep(["1cv8", base]):
+        raise Exception("Base is locked by process: {}".format(pid))
 
     ds_base = basedata.get_designer_base(**parser.get_single_base_params())
     repo = rep.Repository(parser)
