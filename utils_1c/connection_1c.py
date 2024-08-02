@@ -21,6 +21,11 @@ class RemoteConnection(object):
         import paramiko
         self.srv = srv
         self.ssh_key = kwargs["ssh_key"]
+        if self.ssh_key[0] == "D":
+            self.disabled_algorithms = None
+            self.ssh_key = self.ssh_key[1:]
+        else:
+            self.disabled_algorithms = {'pubkeys': ['rsa-sha2-256', 'rsa-sha2-512']}
 
         self.clusters_list = []
         self.bases_dict = {}
@@ -31,11 +36,14 @@ class RemoteConnection(object):
         self.sftp_open = False
 
     def __enter__(self) -> object:
+        import paramiko
+        pkey = paramiko.RSAKey.from_private_key_file(self.ssh_key)
+
         self.ssh.connect(
             hostname=self.srv,
             username='root',
-            key_filename=self.ssh_key,
-            disabled_algorithms={'pubkeys': ['rsa-sha2-256', 'rsa-sha2-512']}
+            pkey=pkey,
+            disabled_algorithms=self.disabled_algorithms
         )
 
         return self
