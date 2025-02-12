@@ -1,6 +1,4 @@
-# scripts1c
-
-scripts:
+# scripts for managing 1C servers on Linux Debian
 
 **** reg 'ras' after update 1C
 ./regras.py -s SRV -k %ssh_pach%/.ssh/id_rsa -t 
