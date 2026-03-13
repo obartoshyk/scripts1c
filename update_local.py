@@ -25,7 +25,7 @@ with connection_1c.Connection(srv=srv, **parser.args) as conn:
 
     ds_base = basedata.get_designer_base(**parser.get_single_base_params())
     repo = rep.Repository(parser)
-    cast_cmd_list(conn, repo.get_pull_cmd("origin master"))
+    cast_cmd_list(conn, repo.get_pull_cmd("origin main"))
     cv = ocv8.DesignerCommand(*ds_base.getparams(),
                               "/UC {}".format("bkp_bot_key"),
                               env=ds_base.env,

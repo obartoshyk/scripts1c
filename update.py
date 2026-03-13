@@ -30,7 +30,7 @@ with connection_1c.Connection(srv=srv, **parser.args) as conn:
                               "/UC {}".format("bkp_bot_key"),
                               env=ds_base.env,
                               cmd_func=conn.cast)
-    cast_cmd_list(conn, repo.get_pull_cmd("origin master"))
+    cast_cmd_list(conn, repo.get_pull_cmd("origin main"))
 
     conn.cast('[ -e "{0}" ] && rm -r {0}'.format(ds_base.outlog))
     w = tw.ThreadWorker(cv.LoadConfigFromFilesUPD)

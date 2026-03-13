@@ -36,7 +36,7 @@ class Repository(object):
         cmd_list = ['[ -d "/tmp/tmpxml" ] && rm -r /tmp/tmpxml',
                     'rm "%(pach)s/ConfigDumpInfo.xml"',
                     'mkdir /tmp/tmpxml']
-        for cmd in self.get_pull_cmd("origin master"):
+        for cmd in self.get_pull_cmd("origin main"):
             cmd_list.append(cmd)
         return self.fcmd_list(cmd_list)
 
